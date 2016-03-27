@@ -314,7 +314,7 @@ section.post, section > p {
   margin: 0;
   padding: 0; }
 
-pre {
+pre, .highlighter-rouge > pre {
   overflow-x: auto;
   padding: 10px 0;
   width: 100%;
