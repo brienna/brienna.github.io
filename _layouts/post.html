@@ -1,5 +1,20 @@
 <html>
   <head>
+    <script type="text/javascript"
+      src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+    </script>
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        "HTML-CSS": {
+          extensions: ["handle-floats.js"],
+          styles: {
+            ".MathJax_Display": {
+                "padding": "-0.2em 0 !important",
+            }
+          }
+        }
+      });
+    </script>
     <meta content='{{ page.title }} - {{ site.title }}' property='og:title' />
     <title>{{ page.title }} - {{ site.title }}</title>
     {% include head.html %}

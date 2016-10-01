@@ -268,7 +268,8 @@ section.post, section > p {
   font-size: 14px;
   line-height: 1.6em; }
   section.post *, section > p * {
-    max-width: 100%; }
+    /* comment out to enable MathJax
+    max-width: 100%; */}
   section.post em strong, section > p em strong {
     background-color: #ffffee;
     padding: 0 2px; }
