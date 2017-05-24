@@ -1,49 +1,28 @@
-<html>
-  <head>
-    <script type="text/javascript"
-      src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
-    </script>
-    <script type="text/x-mathjax-config">
-      MathJax.Hub.Config({
-        "HTML-CSS": {
-          extensions: ["handle-floats.js"],
-          styles: {
-            ".MathJax_Display": {
-                "padding": "-0.2em 0 !important",
-            }
-          }
-        }
-      });
-    </script>
-    <meta content='{{ page.title }} - {{ site.title }}' property='og:title' />
-    <title>{{ page.title }} - {{ site.title }}</title>
-    {% include head.html %}
-  </head>
-  <body>
-    {% include header.html %}
-    <div id='container'>
-      {% include links.html %}
-      {% include pages.html %}
-      <div class="content">
-        <section class='post'>
-          <h1 class="upcase">
-            <div class='date'>{{ page.date | date_to_string }}</div>
-            {{ page.title }}
-          </h1>
-          {{ content }}
+---
+layout: default
+---
 
+<article>
 
-        </section>
-      </div>
-      {% if page.share == 'y' %}
-        {% include share.html %}
-      {% endif %}
+	<div class="center">
+		<h1>{{ page.title }}</h1>
+		<time>{{ page.date | date: '%B %-d, %Y' }}</time>
+	</div>
 
-      {% if page.disqus == 'y' %}
-        {% include disqus.html %}
-      {% endif %}
-      {% include links.html %}
-    </div>
-    {% include footer.html %}
-  </body>
-</html>
+	<div class="divider"></div>
+
+	{{ content }}
+
+</article>
+
+<div class="page-navigation">
+	{% if page.next.url %}
+    <a class="next" href="{{ site.baseurl }}{{page.next.url}}" title="NEXT: {{page.next.title}}">&lt;&lt;</a>
+		<span> &middot; </span>
+  {% endif %}
+		<a class="home" href="{{site.baseurl}}/" title="Back to Homepage">Home</a>
+  {% if page.previous.url %}
+		<span> &middot; </span>
+    <a class="prev" href="{{ site.baseurl }}{{page.previous.url}}" title="PREV: {{page.previous.title}}">&gt;&gt;</a>
+  {% endif %}
+</div>
