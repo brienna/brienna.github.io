@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+
+	<head>
+		<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+
+	<title>Java Error: Cannot make a static reference to the non-static field or method · BRIENNAKH</title>
+
+
+<meta name="twitter:card" content="summary" />
+<meta name="twitter:site" content="@briennakh" />
+<meta name="twitter:title" content="Java Error: Cannot make a static reference to the non-static field or method" />
+<meta name="twitter:description" content="I was working on my project and wanted to test it, so I thought the easiest way would be to create a public static void main method in it as follows.">
+
+<meta name="description" content="I was working on my project and wanted to test it, so I thought the easiest way would be to create a public static void main method in it as follows.">
+
+
+	<meta name="google-site-verification" content="epFgX0s_0RM3CdjwFcsewfXzPov2g8s9ZBOLyaIUH-o">
+
+
+<link rel="icon" href="/assets/favicon.png">
+<link rel="apple-touch-icon" href="/assets/touch-icon.png">
+<link rel="stylesheet" href="/assets/core.css">
+<link rel="canonical" href="/notes/Java-Error-Static-Reference-To-Non-Static">
+<link rel="alternate" type="application/atom+xml" title="BRIENNAKH" href="/feed.xml" />
+
+
+
+
+<script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+
+	</head>
+
+	<body>
+
+		<aside class="logo">
+
+	
+
+	<a href="/">
+		<img src="http://www.gravatar.com/avatar/a1874522e5d9bff764e068c928f0e3c0.png?s=80" class="gravatar">
+	</a>
+	<span class="logo-prompt">Back to Home</span>
+
+</aside>
+
+
+		<main>
+			<article>
+
+	<div class="center">
+		<h1>Java Error: Cannot make a static reference to the non-static field or method</h1>
+		<time>April 19, 2017</time>
+	</div>
+
+	<div class="divider"></div>
+
+	<p>I was working on my project and wanted to test it, so I thought the easiest way would be to create a public static void main method in it as follows.</p>
+
+<div class="language-java highlighter-rouge"><pre class="highlight"><code><span class="kn">package</span> <span class="n">alignmentparser</span><span class="o">;</span>
+
+<span class="kn">import</span> <span class="nn">java.util.Scanner</span><span class="o">;</span>
+
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">AlignmentFileParser</span> <span class="o">{</span>
+    <span class="kd">private</span> <span class="kd">static</span> <span class="n">Scanner</span> <span class="n">sc</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Scanner</span><span class="o">(</span><span class="n">System</span><span class="o">.</span><span class="na">in</span><span class="o">);</span>
+
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">uploadAlignmentFile</span><span class="o">()</span> <span class="o">{</span>
+        <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">"Input BLAST alignment file path: "</span><span class="o">);</span>
+        <span class="n">String</span> <span class="n">s</span> <span class="o">=</span> <span class="n">sc</span><span class="o">.</span><span class="na">nextLine</span><span class="o">();</span>
+        <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="n">s</span><span class="o">);</span>
+    <span class="o">}</span>
+
+    <span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">main</span><span class="o">(</span><span class="n">String</span><span class="o">[]</span> <span class="n">args</span><span class="o">)</span> <span class="o">{</span>
+        <span class="n">uploadAlignmentFile</span><span class="o">();</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+</code></pre>
+</div>
+
+<p>But when I run that, I get the error</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>Exception in thread "main" java.lang.Error: Unresolved compilation problem: 
+    Cannot make a static reference to the non-static method uploadAlignmentFile() from the type AlignmentFileParser
+
+    at alignmentparser.AlignmentFileParser.main(AlignmentFileParser.java:15)
+</code></pre>
+</div>
+
+<p>In Java you have instance members (variables and methods) and static members. Instance members are variables and methods that you can only access when you have an instance of a class.</p>
+
+<p>So the only way to call a non-static method ANYWHERE is to have an instance of the class. You cannot call non-static methods or access non-static fields from main or any other static method, because non-static members belong to a class instance, not to the entire class.</p>
+
+<p>So I could fix it as follows:</p>
+
+<div class="language-java highlighter-rouge"><pre class="highlight"><code><span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">main</span><span class="o">(</span><span class="n">String</span><span class="o">[]</span> <span class="n">args</span><span class="o">)</span> <span class="o">{</span>
+    <span class="n">AlignmentFileParser</span> <span class="n">parser</span> <span class="o">=</span> <span class="k">new</span> <span class="n">AlignmentFileParser</span><span class="o">();</span> 
+    <span class="n">parser</span><span class="o">.</span><span class="na">uploadAlignmentFile</span><span class="o">();</span>
+<span class="o">}</span>
+</code></pre>
+</div>
+
+<p>But since I asked myself “does it make sense to call this method, even if no Obj has been constructed yet?” It does, so I decided to only fix the public void uploadAlignmentFile to static.</p>
+
+
+</article>
+
+<div class="page-navigation">
+	
+		<a class="home" href="/" title="Back to Homepage">Home</a>
+  
+		<span> &middot; </span>
+    <a class="prev" href="/notes/ISTE-208-study-guide-part-1" title="PREV: ISTE-608 Study Guide, Part 1">&gt;&gt;</a>
+  
+</div>
+
+		</main>
+
+		<div class="footer">
+  <span class="block">&lt;/&gt; <a href="http://github.com/heiswayi/the-plain" title="a minimalist Jekyll theme for personal blog">The Plain theme</a> by <a href="http://heiswayi.github.io">Heiswayi Nrird</a>.</span>
+  <span class="block">&copy; 2017 Brienna Herold</span>
+</div>
+
+
+	</body>
+
+</html>

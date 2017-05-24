@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>Brienna Herold</title>
-    <description>A jekyll theme. Because I scribble.</description>
+    <title>BRIENNAKH</title>
+    <description>simply notes</description>
     <link></link>
     
       
@@ -55,8 +55,8 @@
 &lt;p&gt;But since I asked myself “does it make sense to call this method, even if no Obj has been constructed yet?” It does, so I decided to only fix the public void uploadAlignmentFile to static.&lt;/p&gt;
 </description>
           <pubDate>2017-04-19T00:00:00-04:00</pubDate>
-          <link>/2017/04/19/Java-Error-Static-Reference-To-Non-Static/</link>
-          <guid isPermaLink="true">/2017/04/19/Java-Error-Static-Reference-To-Non-Static/</guid>
+          <link>/notes/Java-Error-Static-Reference-To-Non-Static</link>
+          <guid isPermaLink="true">/notes/Java-Error-Static-Reference-To-Non-Static</guid>
         </item>
       
     
@@ -103,8 +103,8 @@
 
 </description>
           <pubDate>2017-04-18T00:00:00-04:00</pubDate>
-          <link>/2017/04/18/ISTE-208-study-guide-part-1/</link>
-          <guid isPermaLink="true">/2017/04/18/ISTE-208-study-guide-part-1/</guid>
+          <link>/notes/ISTE-208-study-guide-part-1</link>
+          <guid isPermaLink="true">/notes/ISTE-208-study-guide-part-1</guid>
         </item>
       
     
@@ -170,8 +170,8 @@ TestRunner.java:9: error: cannot find symbol
 
 </description>
           <pubDate>2017-02-09T00:00:00-05:00</pubDate>
-          <link>/2017/02/09/Compiling-and-running/</link>
-          <guid isPermaLink="true">/2017/02/09/Compiling-and-running/</guid>
+          <link>/notes/Compiling-and-running</link>
+          <guid isPermaLink="true">/notes/Compiling-and-running</guid>
         </item>
       
     
