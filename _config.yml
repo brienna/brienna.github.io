@@ -1,6 +1,6 @@
 # Site Info
-title:              "BRIENNAKH"
-description:        "simply notes"
+title:              "briennakh"
+description:        ""
 google_verify:      epFgX0s_0RM3CdjwFcsewfXzPov2g8s9ZBOLyaIUH-o # Put your Google Verification here
 google_analytics:   UA-XXXXXXX-X # Put your Google Analytics code
 
@@ -12,6 +12,7 @@ twitter_username:   briennakh # Your Twitter username here
 github_username:    briennakh # Your GitHub username here
 
 # Site Settings
+url:                http://briennakh.github.io
 baseurl:            "" # Base URL must end WITHOUT a slash, default: ""
 permalink:          /notes/:title # Post permalink
 timezone:           US/Eastern # https://en.wikipedia.org/wiki/List_of_tz_database_time_zones

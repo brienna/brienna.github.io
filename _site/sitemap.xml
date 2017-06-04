@@ -1,28 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9 http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd" xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 <url>
-<loc>/notes/Java-Error-Static-Reference-To-Non-Static</loc>
-<lastmod>2017-04-19T00:00:00-04:00</lastmod>
-</url>
-<url>
-<loc>/notes/ISTE-208-study-guide-part-1</loc>
-<lastmod>2017-04-18T00:00:00-04:00</lastmod>
-</url>
-<url>
-<loc>/notes/Compiling-and-running</loc>
+<loc>http://briennakh.github.io/notes/Compiling-and-running</loc>
 <lastmod>2017-02-09T00:00:00-05:00</lastmod>
 </url>
 <url>
-<loc>/notes/beware-of-slow-console-logs</loc>
+<loc>http://briennakh.github.io/notes/beware-of-slow-console-logs</loc>
 <lastmod>2016-09-28T00:00:00-04:00</lastmod>
 </url>
 <url>
-<loc>/404</loc>
+<loc>http://briennakh.github.io/404</loc>
 </url>
 <url>
-<loc>/about</loc>
+<loc>http://briennakh.github.io/about</loc>
 </url>
 <url>
-<loc>/</loc>
+<loc>http://briennakh.github.io/</loc>
 </url>
 </urlset>

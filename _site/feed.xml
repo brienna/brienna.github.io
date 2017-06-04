@@ -1,112 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>BRIENNAKH</title>
-    <description>simply notes</description>
-    <link></link>
-    
-      
-        <item>
-          <title>Java Error: Cannot make a static reference to the non-static field or method</title>
-          <description>&lt;p&gt;I was working on my project and wanted to test it, so I thought the easiest way would be to create a public static void main method in it as follows.&lt;/p&gt;
-
-&lt;div class=&quot;language-java highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;kn&quot;&gt;package&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;alignmentparser&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;;&lt;/span&gt;
-
-&lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;java.util.Scanner&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;;&lt;/span&gt;
-
-&lt;span class=&quot;kd&quot;&gt;public&lt;/span&gt; &lt;span class=&quot;kd&quot;&gt;class&lt;/span&gt; &lt;span class=&quot;nc&quot;&gt;AlignmentFileParser&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
-    &lt;span class=&quot;kd&quot;&gt;private&lt;/span&gt; &lt;span class=&quot;kd&quot;&gt;static&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Scanner&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;sc&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;new&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Scanner&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;System&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;in&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;);&lt;/span&gt;
-
-    &lt;span class=&quot;kd&quot;&gt;public&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;void&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;uploadAlignmentFile&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;()&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
-        &lt;span class=&quot;n&quot;&gt;System&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;out&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;println&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;Input BLAST alignment file path: &quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;);&lt;/span&gt;
-        &lt;span class=&quot;n&quot;&gt;String&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;s&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;sc&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;nextLine&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;();&lt;/span&gt;
-        &lt;span class=&quot;n&quot;&gt;System&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;out&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;println&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;s&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;);&lt;/span&gt;
-    &lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
-
-    &lt;span class=&quot;kd&quot;&gt;public&lt;/span&gt; &lt;span class=&quot;kd&quot;&gt;static&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;void&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;main&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;String&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;[]&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;args&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
-        &lt;span class=&quot;n&quot;&gt;uploadAlignmentFile&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;();&lt;/span&gt;
-    &lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
-&lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
-
-&lt;p&gt;But when I run that, I get the error&lt;/p&gt;
-
-&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;Exception in thread &quot;main&quot; java.lang.Error: Unresolved compilation problem: 
-    Cannot make a static reference to the non-static method uploadAlignmentFile() from the type AlignmentFileParser
-
-    at alignmentparser.AlignmentFileParser.main(AlignmentFileParser.java:15)
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
-
-&lt;p&gt;In Java you have instance members (variables and methods) and static members. Instance members are variables and methods that you can only access when you have an instance of a class.&lt;/p&gt;
-
-&lt;p&gt;So the only way to call a non-static method ANYWHERE is to have an instance of the class. You cannot call non-static methods or access non-static fields from main or any other static method, because non-static members belong to a class instance, not to the entire class.&lt;/p&gt;
-
-&lt;p&gt;So I could fix it as follows:&lt;/p&gt;
-
-&lt;div class=&quot;language-java highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;kd&quot;&gt;public&lt;/span&gt; &lt;span class=&quot;kd&quot;&gt;static&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;void&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;main&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;String&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;[]&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;args&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
-    &lt;span class=&quot;n&quot;&gt;AlignmentFileParser&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;parser&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;new&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;AlignmentFileParser&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;();&lt;/span&gt; 
-    &lt;span class=&quot;n&quot;&gt;parser&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;uploadAlignmentFile&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;();&lt;/span&gt;
-&lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
-
-&lt;p&gt;But since I asked myself “does it make sense to call this method, even if no Obj has been constructed yet?” It does, so I decided to only fix the public void uploadAlignmentFile to static.&lt;/p&gt;
-</description>
-          <pubDate>2017-04-19T00:00:00-04:00</pubDate>
-          <link>/notes/Java-Error-Static-Reference-To-Non-Static</link>
-          <guid isPermaLink="true">/notes/Java-Error-Static-Reference-To-Non-Static</guid>
-        </item>
-      
-    
-      
-        <item>
-          <title>ISTE-608 Study Guide, Part 1</title>
-          <description>&lt;p&gt;&lt;em&gt;This post is the first of a series that serve as a study guide for the ISTE-608 waiver exam at the Rochester Institute of Technology.&lt;/em&gt;&lt;/p&gt;
-
-&lt;h3 id=&quot;written-exam&quot;&gt;WRITTEN EXAM&lt;/h3&gt;
-
-&lt;p&gt;&lt;strong&gt;Identify three disadvantages of file systems.&lt;/strong&gt;&lt;/p&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;Data redundancy and inconsistency — There are multiple copies of the same data. For example, if you have contact information about a patient in a file, another file that uses the same information must copy that data to contain it as well. This wastes time, storage space, and money, and risks loss of integrity and consistency, as can occur if the doctor decides to change the patient’s phone number in one of the files and either doesn’t know or forgets about the other file.&lt;/li&gt;
-  &lt;li&gt;Data dependence — The structure (or format) of the data file is defined in the code of the application program that created it, so if you want to change the structure, you must rewrite all application programs that access the file.&lt;/li&gt;
-  &lt;li&gt;Data separation and isolation — Data is isolated in separate files, making the data retrieval process cumbersome. You will have to determine the specific data required from each file and the relationships between the data, and then write an application to process and extract the needed data, while accounting for any difference in file format.&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;&lt;strong&gt;Describe the meaning of the term “database,” including at least four of the following keywords: “shared,” “self-describing,” “organized,” “logically related,” “persistent,” “collection of data.”&lt;/strong&gt;&lt;/p&gt;
-
-&lt;p&gt;A database is an &lt;strong&gt;organized&lt;/strong&gt;, &lt;strong&gt;self-describing collection&lt;/strong&gt; of &lt;strong&gt;persistent&lt;/strong&gt; and &lt;strong&gt;logically related data&lt;/strong&gt; that can be &lt;strong&gt;shared&lt;/strong&gt; among multiple users and applications.&lt;/p&gt;
-
-&lt;p&gt;Keywords:&lt;/p&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;organized — structure reflects the logical relationships among the data&lt;/li&gt;
-  &lt;li&gt;self-describing — contains metadata (a description about itself, such as its structure) in addition to the data&lt;/li&gt;
-  &lt;li&gt;collection of data — self-explanatory&lt;/li&gt;
-  &lt;li&gt;persistent — the data outlives the process that created it&lt;/li&gt;
-  &lt;li&gt;logically related — relationships are relevant to the data storage purpose&lt;/li&gt;
-  &lt;li&gt;shared — multi-user system, hopefully with concurrency control (mechanisms to address conflicts with the simultaneous accessing or altering of data)&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;&lt;strong&gt;Identify three types of data that can be stored in a database.&lt;/strong&gt;&lt;/p&gt;
-
-&lt;p&gt;Most databases support a number of data types, which must be defined before storing data in the database. Some of the more common data types are text, number, enum, currency, boolean, datetime, and objects (such as image and audio files).&lt;/p&gt;
-
-&lt;p&gt;NOTE: Two important reasons why we must properly define data types:&lt;/p&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;Allows for the appropriate functions to be performed with the data.&lt;/li&gt;
-  &lt;li&gt;Allocates the proper amount of storage space for the data.&lt;/li&gt;
-&lt;/ul&gt;
-
-</description>
-          <pubDate>2017-04-18T00:00:00-04:00</pubDate>
-          <link>/notes/ISTE-208-study-guide-part-1</link>
-          <guid isPermaLink="true">/notes/ISTE-208-study-guide-part-1</guid>
-        </item>
-      
+    <title>briennakh</title>
+    <description></description>
+    <link>http://briennakh.github.io</link>
     
       
         <item>
@@ -170,8 +67,8 @@ TestRunner.java:9: error: cannot find symbol
 
 </description>
           <pubDate>2017-02-09T00:00:00-05:00</pubDate>
-          <link>/notes/Compiling-and-running</link>
-          <guid isPermaLink="true">/notes/Compiling-and-running</guid>
+          <link>http://briennakh.github.io/notes/Compiling-and-running</link>
+          <guid isPermaLink="true">http://briennakh.github.io/notes/Compiling-and-running</guid>
         </item>
       
     
@@ -216,8 +113,8 @@ TestRunner.java:9: error: cannot find symbol
 &lt;p&gt;Gregb1609’s case was extreme, but it showed me that console logging really slows down a program’s execution. To prevent giving up performance for nothing, I’ll have to remember to comment out any console log statements before I push code to production.&lt;/p&gt;
 </description>
           <pubDate>2016-09-28T00:00:00-04:00</pubDate>
-          <link>/notes/beware-of-slow-console-logs</link>
-          <guid isPermaLink="true">/notes/beware-of-slow-console-logs</guid>
+          <link>http://briennakh.github.io/notes/beware-of-slow-console-logs</link>
+          <guid isPermaLink="true">http://briennakh.github.io/notes/beware-of-slow-console-logs</guid>
         </item>
       
     

@@ -2,6 +2,7 @@
 layout: post
 title: Compiling and running a Java package from the command line
 date: 2017-02-09
+comments: true
 ---
 
 Up to this point, my experience with Java and the command line has covered only classes in unnamed, or default, packages. Now I'm coding a named package to process DNA sequence alignments, and it took me a while to grasp how to properly compile and run my code from the command line. 

@@ -2,6 +2,7 @@
 layout: post
 title: Beware of slow console logs
 date: 2016-09-28
+comments: true
 ---
 
 JavaScript being silly? `console.log`
