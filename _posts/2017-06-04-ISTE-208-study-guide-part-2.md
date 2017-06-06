@@ -35,7 +35,7 @@ In the relational database, an entity class is mapped to a table, and an entity 
 
 ![types of attributes](/assets/ISTE-208 study guide/attributes.png){: .center-image }
  
-Entity — Real-world object or concept. 
+Entity — Real-world object or concept. Term refers to the entity class, not the entity instance.
  
 Attribute — Descriptive property of the entity.
 
@@ -54,24 +54,45 @@ Derived attribute — Value is derived from other attributes.
 
 Identifier attribute — Uniquely identifies a particular entity instance.
 
+### Compare and contrast the Chen notation and the Crow’s foot notation.
+ 
+The Chen notation favors conceptual modeling, whereas the Crow’s Foot notation favors a more implementation-oriented approach.
+
 ### Describe what an identifier is and its usage.
  
 An identifier, or primary key, is an attribute(s) whose value is unique for each entity instance and thus identifies that particular entity instance.
+
+### Appropriately represent simple identifiers and composite identifiers, using either Chen or Crow’s feet notation.
 
 ### Describe a composite identifier. 
  
 A simple identifier is composed of a single attribute, whereas a composite identifier, or composite key, is a set of attributes. 
 
+### List the steps involved in creating a database.
+ 
+Steps differ between resources. Below are the [guidelines](https://support.office.com/en-US/article/Database-design-basics-EB2159CF-1E30-401A-8084-BD4F9C9CA1F5) provided by Microsoft Access:
+
+1. Determine the purpose of the database.
+2. Find and organize the information required. 
+3. Divide the information into major entities, or tables.
+4. Turn information items into columns. 
+5. Specify primary keys. 
+6. Set up the table relationships. 
+7. Refine the design.
+8. Apply the normalization rules. 
+ 
+*NOTE: I will update this list when I find/understand a better one.* 
+
 ### Transpose an ER diagram, with Chen or Crow’s Feet notation, of a single entity into a relation.
 
-<u>Guidelines:</u><br>
+<u>Basic rules:</u><br>
 Each entity always corresponds to a relation. 
  
 Simple attributes correspond to columns, with the identifier attribute(s) underlined. 
 
 Composite attributes are merged into the same relation the same way as simple attributes.
 
-Multi-valued attributes get their own relations. Within each new relation, add the identifier attribute of the parent entity as a foreign key. Don’t forget to underline an identifier attribute for the new relation itself as well.
+Multi-valued attributes get their own relations. Within each new relation, add the identifier attribute of the parent entity as a foreign key. 
 
 Derived attributes can be ignored, since they are not physically stored in the database.
 
