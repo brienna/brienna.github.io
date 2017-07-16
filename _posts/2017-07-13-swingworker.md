@@ -57,19 +57,21 @@ import java.awt.BorderLayout;
 import javax.swing.JPanel;
 import javax.swing.JFrame;
 import javax.swing.JButton;
-import javax.swing.JProgressBar;
+import javax.swing.JLabel;
+import javax.swing.SwingWorker;
+import javax.swing.SwingConstants;
 import java.awt.event.*;
 
 public class CounterView {
     private JFrame frame;
     private JPanel gui;
-    private JProgressBar progressBar;
     private JButton button;
+    private JLabel count;
 
     public CounterView() {
         customizeFrame();
         createMainPanel();
-        createProgressBar();
+        createCountText();
         createButton();
         addComponentsToFrame();
     }
@@ -84,9 +86,9 @@ public class CounterView {
         gui.setLayout(new BorderLayout());
     }
 
-    private void createProgressBar() {
-        progressBar = new JProgressBar(0, 100);
-        progressBar.setStringPainted(true);
+    private void createCountText() {
+        count = new JLabel("0");
+        count.setHorizontalAlignment(SwingConstants.CENTER);
     }
 
     private void createButton()  {
@@ -101,7 +103,7 @@ public class CounterView {
                     for (int i = 0; i <= 50; i++) {
                         Thread.sleep(100);
                         System.out.println(i);
-                        text.setText(Integer.toString(i));
+                        count.setText(Integer.toString(i));
                     }
                 } catch (Exception error) { 
                     System.out.println(error);
@@ -111,7 +113,7 @@ public class CounterView {
     }
 
     private void addComponentsToFrame() {
-        gui.add(progressBar, BorderLayout.CENTER);
+        gui.add(count, BorderLayout.CENTER);
         gui.add(button, BorderLayout.SOUTH);
         frame.add(gui);
         frame.pack();
