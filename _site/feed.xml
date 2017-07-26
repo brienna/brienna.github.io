@@ -7,6 +7,31 @@
     
       
         <item>
+          <title>Using the MVC pattern to organize code containing a SwingWorker without losing functionality</title>
+          <description>&lt;p&gt;The model manages fundamental behaviors and data of the application. It can respond to requests for information, respond to instructions to change the state of its information, and even to notify observers in event-driven systems when information changes.&lt;/p&gt;
+
+&lt;p&gt;In addition to instructing the model to return data, the Controller can also listen to the Model. The Model can contain code that fires notifications into the netherspace about any state changes. The Controller listens for specific notifications, interprets them, reflects the interpretation to the View.&lt;/p&gt;
+
+&lt;p&gt;Blog post about separating swing worker into logic, and letting a background task that needs to publish happen in another class
+Note: Also note that in most of my more complex Swing GUI’s, I often do my file downloading in a different (model) object and create my SwingWorker in a different object still (control) from the GUI object (the view). It may seem more complicated to do it this way, but it’s a lot easier to debug, maintain and enhance my program when I do it this way, especially when I heavily use interfaces to allow me to test all program components in isolation.
+- File downloading is Model
+- SwingWorker is in Control (to delegate publish to another class, all your getData(…) method needs to do is to periodically update a class property and notify listeners. Makes it easy to decouple the logic from the presentation.&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;https://stackoverflow.com/questions/2908306/how-to-delegate-swingworkers-publish-to-other-methods
+https://kodejava.org/how-do-i-listen-for-beans-property-change-event/&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;Figure out why so many calls to System print ln… in my progress bar?&lt;/p&gt;
+</description>
+          <pubDate>2017-07-25T00:00:00-04:00</pubDate>
+          <link>http://briennakh.github.io/notes/swingworker-mvc-organization</link>
+          <guid isPermaLink="true">http://briennakh.github.io/notes/swingworker-mvc-organization</guid>
+        </item>
+      
+    
+      
+        <item>
           <title>Don't block the GUI: Dealing with long-running tasks in Swing, part 1</title>
           <description>&lt;p&gt;Swing is not thread-safe. Because of this, you can update the GUI from only the event dispatch thread, and not any other thread, otherwise unwanted behavior may result. If you can update the GUI from only the event dispatch thread, how do you handle long-running tasks that may lock up this thread, freezing the GUI?&lt;/p&gt;
 
@@ -253,54 +278,74 @@
     
       
         <item>
-          <title>Implement MVC in a simple GUI</title>
-          <description>&lt;p&gt;I’m learning how to build a GUI in Java, implementing the MVC design pattern in it.&lt;/p&gt;
+          <title>Building a simple Swing GUI using the MVC design pattern</title>
+          <description>&lt;p&gt;I’m learning how to build a simple Swing GUI in Java using the MVC design pattern.&lt;/p&gt;
 
-&lt;p&gt;&lt;em&gt;A note on GUI libraries: There exist several GUI libraries. While the JavaFX library is the future of GUI programming, I’ll be using the older Swing library, as it’ll be on the ISTE-200 waiver exam at the Rochester Institute of Technology.&lt;/em&gt;&lt;/p&gt;
-
-&lt;p&gt;*A note on MVC: The design pattern I’m using is actually called PAC, but is mistaken for MVC. The reason that we call PAC “MVC” in the web world is that people were trying to implement MVC. https://www.garfieldtech.com/blog/mvc-vs-pac&lt;/p&gt;
+&lt;p&gt;&lt;em&gt;Note: I’m unsure if MVC is the correct name for the design pattern. I see conflicting explanations. Some say it is MVC. Some say that it’s PAC, what inexperienced programmers accidentally ended up with when they tried to implement MVC. Some say that since a web application doesn’t map nicely to either MVC or PAC, it’s a sort of hybrid pattern. When I figure this out, I’ll edit the post.&lt;/em&gt;&lt;/p&gt;
 
 &lt;h3 id=&quot;what-is-mvc&quot;&gt;What is MVC?&lt;/h3&gt;
 
 &lt;p&gt;Model-View-Controller (MVC) is a pattern for organizing code in applications that implement user interfaces. MVC achieves its organization by separating the application code into three components: the Model, the View, and the Controller.&lt;/p&gt;
 
-&lt;p&gt;&lt;u&gt;Components&lt;/u&gt;&lt;/p&gt;
+&lt;p&gt;&lt;u&gt;Components:&lt;/u&gt;&lt;/p&gt;
 
-&lt;p&gt;&lt;strong&gt;Model&lt;/strong&gt; — the class(es) that contains the data and the methods needed to manipulate the data.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Model&lt;/strong&gt; — contains the data and the methods needed to manipulate the data.&lt;/p&gt;
 
-&lt;p&gt;&lt;strong&gt;View&lt;/strong&gt; — the class(es) that contains the external interface (GUI, CLI, web form, high-level IPC, etc.) that the outside world sees and interacts with.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;View&lt;/strong&gt; — contains the interface that the outside world sees and interacts with.&lt;/p&gt;
 
-&lt;p&gt;&lt;strong&gt;Controller&lt;/strong&gt; — the class(es) that coordinates interactions between the Model and the View.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Controller&lt;/strong&gt; — coordinates interactions between the Model and the View.&lt;/p&gt;
 
-&lt;p&gt;&lt;u&gt;Interactions between the components&lt;/u&gt;&lt;/p&gt;
+&lt;p&gt;&lt;u&gt;Interactions between the components:&lt;/u&gt;&lt;/p&gt;
 
 &lt;p&gt;&lt;img src=&quot;/assets/06-28-17/mvc.png&quot; alt=&quot;mvc diagram of interactions&quot; class=&quot;center-image&quot; /&gt;&lt;/p&gt;
 
-&lt;p&gt;The key to the MVC pattern is the &lt;em&gt;direction&lt;/em&gt; in which instruction flows. All instructions flow from the View to the Controller and then to the Model. The Model never SENDS instructions out to the View OR Controller, it only has information PULLED from it by the Controller. The Model and the View do not know that each other exist. The Controller faciliates interactions between the two, by invoking either API.&lt;/p&gt;
+&lt;p&gt;The key to the MVC pattern is the &lt;em&gt;direction&lt;/em&gt; in which instructions flow. The View and the Model are both “dumb”; they don’t know about the existence of anything outside of themselves. Neither component ever sends instructions out. The Controller is the master; it is in command of everything. All instructions flow from it.&lt;/p&gt;
+
+&lt;p&gt;Although the View and Model don’t send instructions, they can notify the Controller in event-driven systems when information changes. The Controller listens for such notifications and defines the actions that the View and Model will execute in response. It does this by defining and passing listeners to the View and Model, which should provide methods that take the listeners as parameters and attach them to the appropriate objects.&lt;/p&gt;
 
 &lt;p&gt;This separateness makes for maintainable code, since the programmer can go in to change only one part, without breaking apart the entire program.&lt;/p&gt;
 
-&lt;p&gt;In fact, the test of a true MVC design is whether the program is fully functional even without the View and Controller. Yes, the outside world probably will have trouble interacting with the program in that form, but as long as one knows the model’s API, the program should hold and manipulate data as it would with a View and Controller.&lt;/p&gt;
+&lt;p&gt;In fact, the test of a true MVC design is whether the program is fully functional even without the View and Controller. Yes, the outside world probably will have trouble interacting with the program in that form, but as long as one knows the Model’s API, the program should hold and manipulate data as it would with a View and Controller.&lt;/p&gt;
 
-&lt;p&gt;An analogy for understanding MVC: Imagine a photographer with her camera in a studio, taking pictures of a box. The box is the &lt;em&gt;model&lt;/em&gt;, the photographer is the &lt;em&gt;controller&lt;/em&gt;, and the camera is the &lt;em&gt;view&lt;/em&gt;.&lt;/p&gt;
-
-&lt;p&gt;The box does not know about the existence of the camera or the photographer. It’s completely independent. This separation allows the photographer to walk around the box and point the camera at any angle to get the shot/view that she wants.&lt;/p&gt;
-
-&lt;p&gt;Non-MVC architecture is usually tightly integrated. If the box, the controller, and the view were the same object, then we would have to pull apart and re-build both the box and camera each time we wanted to get a new view. Also, taking the photo would be like trying to get that perfect selfie - not always easy.&lt;/p&gt;
-
-&lt;h3 id=&quot;mvc-in-action&quot;&gt;MVC in action&lt;/h3&gt;
+&lt;h3 id=&quot;a-simple-swing-gui-that-uses-the-mvc-design-pattern&quot;&gt;A simple Swing GUI that uses the MVC design pattern&lt;/h3&gt;
 
 &lt;p&gt;Following Derek Banas’ &lt;a href=&quot;https://www.youtube.com/watch?v=dTVVa2gfht8&quot;&gt;YouTube tutorial&lt;/a&gt;, I built a simple calculator with Swing and MVC that lets the user enter two numbers, press a button to add the numbers, and view the sum.&lt;/p&gt;
 
-&lt;p&gt;&lt;img src=&quot;/assets/06-28-17/derek banas mvc.png&quot; alt=&quot;Derek Banas' calculator&quot; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;/assets/06-28-17/derek banas mvc.png&quot; alt=&quot;Derek Banas' calculator&quot; class=&quot;center-image&quot; /&gt;&lt;/p&gt;
 
 &lt;p&gt;The package structure:&lt;/p&gt;
 
 &lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;mvc_tutorial
-    |_ CalculatorModel.java
+    |_ MVCCalculator.java   
+    |_ CalculatorModel.java 
     |_ CalculatorView.java
-    |_ CalculatorController.java
-    |_ MVCCalculator.java
+    |_ CalculatorController.java  
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;CalculatorModel.java&lt;/code&gt; contains the model, &lt;code class=&quot;highlighter-rouge&quot;&gt;CalculatorView.java&lt;/code&gt; the view, and &lt;code class=&quot;highlighter-rouge&quot;&gt;CalculatorController.java&lt;/code&gt; the controller. &lt;code class=&quot;highlighter-rouge&quot;&gt;MVCCalculator.java&lt;/code&gt; launches the program.&lt;/p&gt;
+
+&lt;p&gt;MVCCalculator.java:&lt;/p&gt;
+
+&lt;div class=&quot;language-java highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;kn&quot;&gt;package&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;mvc_tutorial&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;;&lt;/span&gt;
+
+&lt;span class=&quot;cm&quot;&gt;/**
+ * 
+ * Runs the MVC. 
+ *
+ */&lt;/span&gt;
+&lt;span class=&quot;kd&quot;&gt;public&lt;/span&gt; &lt;span class=&quot;kd&quot;&gt;class&lt;/span&gt; &lt;span class=&quot;nc&quot;&gt;MVCCalculator&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;kd&quot;&gt;public&lt;/span&gt; &lt;span class=&quot;kd&quot;&gt;static&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;void&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;main&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;String&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;[]&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;args&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
+        &lt;span class=&quot;c1&quot;&gt;// Create the View&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;CalculatorView&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;theView&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;new&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;CalculatorView&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;();&lt;/span&gt;
+        &lt;span class=&quot;c1&quot;&gt;// Create the Model&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;CalculatorModel&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;theModel&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;new&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;CalculatorModel&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;();&lt;/span&gt;
+        &lt;span class=&quot;c1&quot;&gt;// Create the Controller&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;CalculatorController&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;theController&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;new&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;CalculatorController&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;theView&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;theModel&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;);&lt;/span&gt;
+        &lt;span class=&quot;c1&quot;&gt;// Show the view on the screen&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;theView&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;setVisible&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kc&quot;&gt;true&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;);&lt;/span&gt;
+    &lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
+&lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;
 &lt;/div&gt;
 
@@ -314,7 +359,7 @@
  *
  */&lt;/span&gt;
 &lt;span class=&quot;kd&quot;&gt;public&lt;/span&gt; &lt;span class=&quot;kd&quot;&gt;class&lt;/span&gt; &lt;span class=&quot;nc&quot;&gt;CalculatorModel&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
-    &lt;span class=&quot;c1&quot;&gt;// Holds the sum of the numbers entered in the view&lt;/span&gt;
+    &lt;span class=&quot;c1&quot;&gt;// The sum of the numbers entered in the view&lt;/span&gt;
     &lt;span class=&quot;kd&quot;&gt;private&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;int&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;calculationValue&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;;&lt;/span&gt;
     
     &lt;span class=&quot;c1&quot;&gt;// Perform a calculation&lt;/span&gt;
@@ -339,7 +384,7 @@
 
 &lt;span class=&quot;cm&quot;&gt;/**
  * 
- * Contains the external interface (GUI) that the outside world sees and interacts with.
+ * Contains the interface (GUI) that the outside world sees and interacts with.
  *
  */&lt;/span&gt;
 &lt;span class=&quot;kd&quot;&gt;public&lt;/span&gt; &lt;span class=&quot;kd&quot;&gt;class&lt;/span&gt; &lt;span class=&quot;nc&quot;&gt;CalculatorView&lt;/span&gt; &lt;span class=&quot;kd&quot;&gt;extends&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;JFrame&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
@@ -377,21 +422,17 @@
         &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Integer&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;parseInt&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;calcSolution&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;getText&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;());&lt;/span&gt;
     &lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
     
-    &lt;span class=&quot;c1&quot;&gt;// Set solution (which will be called by the Controller)&lt;/span&gt;
+    &lt;span class=&quot;c1&quot;&gt;// Set solution&lt;/span&gt;
     &lt;span class=&quot;kd&quot;&gt;public&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;void&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;setCalcSolution&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;int&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;solution&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
         &lt;span class=&quot;n&quot;&gt;calcSolution&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;setText&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Integer&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;toString&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;solution&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;));&lt;/span&gt;
     &lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
     
-    &lt;span class=&quot;c1&quot;&gt;// Most complicated part is below&lt;/span&gt;
-    
-    &lt;span class=&quot;c1&quot;&gt;// If the calculateButton is clicked, execute a method&lt;/span&gt;
-    &lt;span class=&quot;c1&quot;&gt;// in the Controller named actionPerformed&lt;/span&gt;
-    &lt;span class=&quot;c1&quot;&gt;// NOTE: Controller, not view, handles actual actions&lt;/span&gt;
-    &lt;span class=&quot;kt&quot;&gt;void&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;addCalculateListener&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;ActionListener&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;listenForCalcButton&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
-        &lt;span class=&quot;n&quot;&gt;calculateButton&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;addActionListener&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;listenForCalcButton&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;);&lt;/span&gt;
+    &lt;span class=&quot;c1&quot;&gt;// If the calculateButton is clicked, execute listener's actionPerformed method&lt;/span&gt;
+    &lt;span class=&quot;kt&quot;&gt;void&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;addCalculateListener&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;ActionListener&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;listener&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;calculateButton&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;addActionListener&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;listener&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;);&lt;/span&gt;
     &lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
     
-    &lt;span class=&quot;c1&quot;&gt;// Open a popup that contains the error message passed (from the Controller)&lt;/span&gt;
+    &lt;span class=&quot;c1&quot;&gt;// Open a popup that contains the error message passed&lt;/span&gt;
     &lt;span class=&quot;kt&quot;&gt;void&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;displayErrorMessage&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;String&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;errorMessage&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
         &lt;span class=&quot;n&quot;&gt;JOptionPane&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;showMessageDialog&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;this&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;errorMessage&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;);&lt;/span&gt;
     &lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
@@ -446,39 +487,7 @@
 &lt;/code&gt;&lt;/pre&gt;
 &lt;/div&gt;
 
-&lt;p&gt;MVCCalculator.java&lt;/p&gt;
-
-&lt;div class=&quot;language-java highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;kn&quot;&gt;package&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;mvc_tutorial&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;;&lt;/span&gt;
-
-&lt;span class=&quot;cm&quot;&gt;/**
- * 
- * Runs the MVC. 
- *
- */&lt;/span&gt;
-&lt;span class=&quot;kd&quot;&gt;public&lt;/span&gt; &lt;span class=&quot;kd&quot;&gt;class&lt;/span&gt; &lt;span class=&quot;nc&quot;&gt;MVCCalculator&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
-    &lt;span class=&quot;kd&quot;&gt;public&lt;/span&gt; &lt;span class=&quot;kd&quot;&gt;static&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;void&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;main&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;String&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;[]&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;args&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
-        &lt;span class=&quot;c1&quot;&gt;// Create the View&lt;/span&gt;
-        &lt;span class=&quot;n&quot;&gt;CalculatorView&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;theView&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;new&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;CalculatorView&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;();&lt;/span&gt;
-        &lt;span class=&quot;c1&quot;&gt;// Create the Model&lt;/span&gt;
-        &lt;span class=&quot;n&quot;&gt;CalculatorModel&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;theModel&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;new&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;CalculatorModel&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;();&lt;/span&gt;
-        &lt;span class=&quot;c1&quot;&gt;// Create the Controller&lt;/span&gt;
-        &lt;span class=&quot;n&quot;&gt;CalculatorController&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;theController&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;new&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;CalculatorController&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;theView&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;theModel&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;);&lt;/span&gt;
-        &lt;span class=&quot;c1&quot;&gt;// Show the view on the screen&lt;/span&gt;
-        &lt;span class=&quot;n&quot;&gt;theView&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;setVisible&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kc&quot;&gt;true&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;);&lt;/span&gt;
-    &lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
-&lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
-
-&lt;h3 id=&quot;tips-for-separating-code-within-mvc&quot;&gt;Tips for separating code within MVC&lt;/h3&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;The Controller doesn’t care how certain user actions occur, only that they can. So the View should provide methods that take Actionlisteners as parameters and attach them to the appropriate UI element, and then the Controller maintains the code&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;So ActionListeners for the UI should be maintained by the View, which then sends out. The Controller will manage an ActionListener to listen for when certain events occur in the view&lt;/p&gt;
-
-&lt;p&gt;https://softwareengineering.stackexchange.com/questions/127624/what-is-mvc-really&lt;/p&gt;
+&lt;p&gt;When the user clicks the “Calculate” button, the View notifies the Controller of this user action via the &lt;code class=&quot;highlighter-rouge&quot;&gt;CalculateListener&lt;/code&gt; listener. The Controller defined this listener and passed it to the View via the &lt;code class=&quot;highlighter-rouge&quot;&gt;addCalculateListener&lt;/code&gt; method, which attached the listener to the button. In the listener’s &lt;code class=&quot;highlighter-rouge&quot;&gt;actionPerformed&lt;/code&gt; method, the Controller retrieves the number that the user entered, instructs the Model to add them, and retrieves the sum, telling the View to display it.&lt;/p&gt;
 </description>
           <pubDate>2017-06-28T00:00:00-04:00</pubDate>
           <link>http://briennakh.github.io/notes/learning-mvc</link>
