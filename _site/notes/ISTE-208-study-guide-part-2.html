@@ -77,7 +77,7 @@
 
 <p>Tuple — (row) a set of attribute values, represents an entity instance.</p>
 
-<p><img src="/assets/ISTE-208 study guide/relational database terms.png" alt="relational model terms" /></p>
+<p><img src="/assets/06-04-17/relational database terms.png" alt="relational model terms" /></p>
 
 <h3 id="describe-and-identify-the-difference-between-an-entity-class-and-an-entity-instance">Describe and identify the difference between an Entity Class and an Entity Instance.</h3>
 
@@ -87,9 +87,9 @@
 
 <h3 id="recognize-the-following-when-given-an-er-diagram-and-state-what-the-meaning-is-entity-attribute-simple-vs-composite-single-valued-vs-multi-valued-stored-vs-derived-and-identifier">Recognize the following, when given an ER diagram, and state what the meaning is: Entity, Attribute (simple vs composite; single-valued vs multi-valued, stored vs derived, and identifier).</h3>
 
-<p><img src="/assets/ISTE-208 study guide/attributes.png" alt="types of attributes" class="center-image" /></p>
+<p><img src="/assets/06-04-17/attributes.png" alt="types of attributes" class="center-image" /></p>
 
-<p>Entity — Real-world object or concept.</p>
+<p>Entity — Real-world object or concept. Term refers to the entity class, not the entity instance.</p>
 
 <p>Attribute — Descriptive property of the entity.</p>
 
@@ -108,30 +108,53 @@ Simple attribute — Atomic.</p>
 
 <p>Identifier attribute — Uniquely identifies a particular entity instance.</p>
 
+<h3 id="compare-and-contrast-the-chen-notation-and-the-crows-foot-notation">Compare and contrast the Chen notation and the Crow’s foot notation.</h3>
+
+<p>The Chen notation favors conceptual modeling, whereas the Crow’s Foot notation favors a more implementation-oriented approach.</p>
+
 <h3 id="describe-what-an-identifier-is-and-its-usage">Describe what an identifier is and its usage.</h3>
 
 <p>An identifier, or primary key, is an attribute(s) whose value is unique for each entity instance and thus identifies that particular entity instance.</p>
+
+<h3 id="appropriately-represent-simple-identifiers-and-composite-identifiers-using-either-chen-or-crows-feet-notation">Appropriately represent simple identifiers and composite identifiers, using either Chen or Crow’s feet notation.</h3>
 
 <h3 id="describe-a-composite-identifier">Describe a composite identifier.</h3>
 
 <p>A simple identifier is composed of a single attribute, whereas a composite identifier, or composite key, is a set of attributes.</p>
 
+<h3 id="list-the-steps-involved-in-creating-a-database">List the steps involved in creating a database.</h3>
+
+<p>Steps differ between resources. Below are the <a href="https://support.office.com/en-US/article/Database-design-basics-EB2159CF-1E30-401A-8084-BD4F9C9CA1F5">guidelines</a> provided by Microsoft Access:</p>
+
+<ol>
+  <li>Determine the purpose of the database.</li>
+  <li>Find and organize the information required.</li>
+  <li>Divide the information into major entities, or tables.</li>
+  <li>Turn information items into columns.</li>
+  <li>Specify primary keys.</li>
+  <li>Set up the table relationships.</li>
+  <li>Refine the design.</li>
+  <li>Apply the normalization rules.</li>
+</ol>
+
+<p><em>NOTE: I will update this list when I find/understand a better one.</em></p>
+
 <h3 id="transpose-an-er-diagram-with-chen-or-crows-feet-notation-of-a-single-entity-into-a-relation">Transpose an ER diagram, with Chen or Crow’s Feet notation, of a single entity into a relation.</h3>
 
-<p><u>Guidelines:</u><br />
+<p><u>Basic rules:</u><br />
 Each entity always corresponds to a relation.</p>
 
 <p>Simple attributes correspond to columns, with the identifier attribute(s) underlined.</p>
 
 <p>Composite attributes are merged into the same relation the same way as simple attributes.</p>
 
-<p>Multi-valued attributes get their own relations. Within each new relation, add the identifier attribute of the parent entity as a foreign key. Don’t forget to underline an identifier attribute for the new relation itself as well.</p>
+<p>Multi-valued attributes get their own relations. Within each new relation, add the identifier attribute of the parent entity as a foreign key.</p>
 
 <p>Derived attributes can be ignored, since they are not physically stored in the database.</p>
 
 <p><u>ER diagram, with Chen notation:</u></p>
 
-<p><img src="/assets/ISTE-208 study guide/ER-diagram.png" alt="types of attributes" class="center-image" /></p>
+<p><img src="/assets/06-04-17/ER-diagram.png" alt="types of attributes" class="center-image" /></p>
 
 <p><u>Relations:</u></p>
 
@@ -167,10 +190,13 @@ Each entity always corresponds to a relation.</p>
 
 <div class="page-navigation">
 	
+    <a class="next" href="/notes/learning-mvc" title="NEXT: Building a simple Swing GUI using the MVC design pattern">&lt;&lt;</a>
+		<span> &middot; </span>
+  
 		<a class="home" href="/" title="Back to Homepage">Home</a>
   
 		<span> &middot; </span>
-    <a class="prev" href="/notes/Compiling-and-running" title="PREV: Compiling and running a Java package from the command line">&gt;&gt;</a>
+    <a class="prev" href="/notes/Compiling-and-running" title="PREV: How to compile and execute a package from the command line">&gt;&gt;</a>
   
 </div>
 

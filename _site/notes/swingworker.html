@@ -7,12 +7,12 @@
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 
 
-	<title>Don't block the GUI: Dealing with long-running tasks in Swing, part 1 · briennakh</title>
+	<title>Don't block the GUI: Dealing with long-running tasks using a SwingWorker · briennakh</title>
 
 
 <meta name="twitter:card" content="summary" />
 <meta name="twitter:site" content="@briennakh" />
-<meta name="twitter:title" content="Don't block the GUI: Dealing with long-running tasks in Swing, part 1" />
+<meta name="twitter:title" content="Don't block the GUI: Dealing with long-running tasks using a SwingWorker" />
 <meta name="twitter:description" content="Swing is not thread-safe. Because of this, you can update the GUI from only the event dispatch thread, and not any other thread, otherwise unwanted behavior may result. If you can update the GUI fr...">
 
 <meta name="description" content="Swing is not thread-safe. Because of this, you can update the GUI from only the event dispatch thread, and not any other thread, otherwise unwanted behavior ...">
@@ -53,7 +53,7 @@
 			<article>
 
 	<div class="center">
-		<h1>Don't block the GUI: Dealing with long-running tasks in Swing, part 1</h1>
+		<h1>Don't block the GUI: Dealing with long-running tasks using a SwingWorker</h1>
 		<time>July 13, 2017</time>
 	</div>
 
@@ -75,7 +75,7 @@
 
 <p>You don’t need to explicitly create these threads; they are provided by the runtime or the Swing framework. You just utilize these threads to create a responsive, maintainable Swing program.</p>
 
-<h3 id="run-a-swing-program-on-the-event-dispatch-thread">Run a Swing program on the event dispatch thread</h3>
+<h3 id="a-swing-program-runs-on-the-event-dispatch-thread">A Swing program runs on the event dispatch thread</h3>
 
 <p>Like other standard Java programs, a Swing program starts on the initial thread. The initial thread could simply create the GUI itself, but this isn’t recommended. For a Swing program, the initial thread’s recommended job is to “create a Runnable object that initializes the GUI and schedule that object for execution on the event dispatch thread” <a href="https://docs.oracle.com/javase/tutorial/uiswing/concurrency/initial.html">(Oracle)</a>.</p>
 
@@ -98,7 +98,7 @@
 </code></pre>
 </div>
 
-<h3 id="long-running-tasks-on-the-event-dispatch-thread-block-the-gui">Long-running tasks on the event dispatch thread block the GUI</h3>
+<h3 id="dont-block-the-gui-by-putting-long-running-tasks-on-the-event-dispatch-thread">Don’t block the GUI by putting long-running tasks on the event dispatch thread</h3>
 
 <p>“Once the GUI is created, the program is primarily driven by GUI events, each of which causes the execution of a short task on the event dispatch thread” <a href="https://docs.oracle.com/javase/tutorial/uiswing/concurrency/initial.html">(Oracle)</a>.</p>
 
@@ -129,6 +129,7 @@
         <span class="n">createCountText</span><span class="o">();</span>
         <span class="n">createButton</span><span class="o">();</span>
         <span class="n">addComponentsToFrame</span><span class="o">();</span>
+        <span class="n">frame</span><span class="o">.</span><span class="na">setVisible</span><span class="o">(</span><span class="kc">true</span><span class="o">);</span>
     <span class="o">}</span>
 
     <span class="kd">private</span> <span class="kt">void</span> <span class="nf">customizeFrame</span><span class="o">()</span> <span class="o">{</span>
@@ -173,23 +174,19 @@
         <span class="n">frame</span><span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="n">gui</span><span class="o">);</span>
         <span class="n">frame</span><span class="o">.</span><span class="na">pack</span><span class="o">();</span>
     <span class="o">}</span>
-
-    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">activate</span><span class="o">()</span> <span class="o">{</span>
-        <span class="n">frame</span><span class="o">.</span><span class="na">setVisible</span><span class="o">(</span><span class="kc">true</span><span class="o">);</span>
-    <span class="o">}</span>
 <span class="o">}</span>
 </code></pre>
 </div>
 
-<p><img src="/assets/07-13-17/frozen_gui.gif" alt="frozen gui" /></p>
+<p><img src="/assets/07-13-17/frozen_gui.gif" alt="frozen gui" class="center-image" /></p>
 
 <p>As the GIF shows, the GUI has frozen. Because there is a long-running task happening on the event dispatch thread, I am unable to resize the window or do anything with the GUI until the task has completed.</p>
 
-<h3 id="move-long-running-tasks-to-worker-threads">Move long-running tasks to worker threads</h3>
+<h3 id="how-to-handle-long-running-tasks">How to handle long-running tasks</h3>
 
 <p>To avoid blocking the GUI, move a long-running task to another thread, the worker thread.</p>
 
-<p>Since you can update the GUI from only the event dispatch thread, you need to faciliate communication between the worker thread and the event dispatch thread. The easiest way to do this is to use the <code class="highlighter-rouge">javax.swing.SwingWorker</code> class, which runs a task on a worker thread and manages the interthread communication.</p>
+<p>Since you can update the GUI from only the event dispatch thread, you need to faciliate communication between the worker thread and the event dispatch thread. The easiest way to do this in Swing is to use the <code class="highlighter-rouge">javax.swing.SwingWorker</code> class, which runs a task on a worker thread and manages the interthread communication.</p>
 
 <p>In the following code edit, the “Start counter” button action listener creates and executes an instance of <code class="highlighter-rouge">SwingWorker</code> from the event dispatch thread. When the user presses the button, the worker object launches a worker thread and runs the task on it, leaving the event dispatch thread unblocked.</p>
 
@@ -205,37 +202,34 @@
             <span class="n">SwingWorker</span><span class="o">&lt;</span><span class="n">Void</span><span class="o">,</span> <span class="n">Void</span><span class="o">&gt;</span> <span class="n">worker</span> <span class="o">=</span> <span class="k">new</span> <span class="n">SwingWorker</span><span class="o">&lt;</span><span class="n">Void</span><span class="o">,</span> <span class="n">Void</span><span class="o">&gt;()</span> <span class="o">{</span>
 
                 <span class="nd">@Override</span>
-                <span class="kd">protected</span> <span class="n">Void</span> <span class="nf">doInBackground</span><span class="o">()</span> <span class="kd">throws</span> <span class="n">Exception</span> <span class="o">{</span>
+                <span class="kd">protected</span> <span class="n">Void</span> <span class="nf">doInBackground</span><span class="o">()</span> <span class="kd">throws</span> <span class="n">InterruptedException</span> <span class="o">{</span>
                     <span class="k">for</span> <span class="o">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="o">;</span> <span class="n">i</span> <span class="o">&lt;=</span> <span class="mi">50</span><span class="o">;</span> <span class="n">i</span><span class="o">++)</span> <span class="o">{</span>
                         <span class="n">Thread</span><span class="o">.</span><span class="na">sleep</span><span class="o">(</span><span class="mi">100</span><span class="o">);</span>
                         <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="n">i</span><span class="o">);</span>
-                        <span class="n">text</span><span class="o">.</span><span class="na">setText</span><span class="o">(</span><span class="n">Integer</span><span class="o">.</span><span class="na">toString</span><span class="o">(</span><span class="n">i</span><span class="o">));</span>
+                        <span class="n">count</span><span class="o">.</span><span class="na">setText</span><span class="o">(</span><span class="n">Integer</span><span class="o">.</span><span class="na">toString</span><span class="o">(</span><span class="n">i</span><span class="o">));</span>
                     <span class="o">}</span>
 
                     <span class="k">return</span> <span class="kc">null</span><span class="o">;</span>
                 <span class="o">}</span>
             <span class="o">};</span>
 
+            <span class="n">button</span><span class="o">.</span><span class="na">setEnabled</span><span class="o">(</span><span class="kc">false</span><span class="o">);</span>
             <span class="c1">// Start the worker</span>
             <span class="n">worker</span><span class="o">.</span><span class="na">execute</span><span class="o">();</span>
+            <span class="n">button</span><span class="o">.</span><span class="na">setEnabled</span><span class="o">(</span><span class="kc">true</span><span class="o">);</span> 
         <span class="o">}</span>
     <span class="o">});</span>
 <span class="o">}</span>
 </code></pre>
 </div>
 
-<p><img src="/assets/07-13-17/unfrozen_gui.gif" alt="unfrozen gui" /></p>
+<p><img src="/assets/07-13-17/unfrozen_gui.gif" alt="unfrozen gui" class="center-image" /></p>
 
 <p>As the GIF shows, the GUI does not freeze, because the long-running task has been moved to a worker thread.</p>
 
-<p><strong>Notes about <code class="highlighter-rouge">SwingWorker</code>:</strong></p>
+<p>Note about <code class="highlighter-rouge">SwingWorker</code>: Each long-running task gets its own <code class="highlighter-rouge">SwingWorker</code> worker, and each worker can be used only once.</p>
 
-<ul>
-  <li><code class="highlighter-rouge">SwingWorker</code> is an abstract class, so you must define a subclass before you can create a <code class="highlighter-rouge">SwingWorker</code> object.</li>
-  <li>Each long-running task gets its own <code class="highlighter-rouge">SwingWorker</code> object.</li>
-  <li>Each <code class="highlighter-rouge">SwingWorker</code> object can be used only once.</li>
-  <li>The anatomy of a <code class="highlighter-rouge">SwingWorker</code> object is beyond the scope of this article; it will be discussed in a follow-up article.</li>
-</ul>
+<p><em>Note about the GIFs: The GIFs don’t show the button becoming disabled after the click, because this edit occurred after the GIFs’ creation.</em></p>
 
 <h3 id="troubleshooting">Troubleshooting</h3>
 
@@ -268,6 +262,9 @@
 
 <div class="page-navigation">
 	
+    <a class="next" href="/notes/swingworker-mvc-organization" title="NEXT: Where to invoke a SwingWorker in the MVC pattern">&lt;&lt;</a>
+		<span> &middot; </span>
+  
 		<a class="home" href="/" title="Back to Homepage">Home</a>
   
 		<span> &middot; </span>

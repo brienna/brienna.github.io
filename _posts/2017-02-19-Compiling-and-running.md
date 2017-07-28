@@ -1,6 +1,6 @@
 ---
 layout: post
-title: Compiling and running a Java package from the command line
+title: How to compile and execute a package from the command line
 date: 2017-02-09
 comments: true
 ---

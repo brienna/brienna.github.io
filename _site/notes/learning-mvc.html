@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="en">
+
+	<head>
+		<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+
+	<title>Building a simple Swing GUI using the MVC design pattern · briennakh</title>
+
+
+<meta name="twitter:card" content="summary" />
+<meta name="twitter:site" content="@briennakh" />
+<meta name="twitter:title" content="Building a simple Swing GUI using the MVC design pattern" />
+<meta name="twitter:description" content="I’m learning how to build a simple Swing GUI in Java using the MVC design pattern.">
+
+<meta name="description" content="I’m learning how to build a simple Swing GUI in Java using the MVC design pattern.">
+
+
+	<meta name="google-site-verification" content="epFgX0s_0RM3CdjwFcsewfXzPov2g8s9ZBOLyaIUH-o">
+
+
+<link rel="icon" href="/assets/favicon.png">
+<link rel="apple-touch-icon" href="/assets/touch-icon.png">
+<link rel="stylesheet" href="/assets/core.css">
+<link rel="canonical" href="/notes/learning-mvc">
+<link rel="alternate" type="application/atom+xml" title="briennakh" href="/feed.xml" />
+
+
+
+
+<script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+
+	</head>
+
+	<body>
+
+		<aside class="logo">
+
+	
+
+	<a href="/">
+		<img src="http://www.gravatar.com/avatar/a1874522e5d9bff764e068c928f0e3c0.png?s=80" class="gravatar">
+	</a>
+	<span class="logo-prompt">Back to Home</span>
+
+</aside>
+
+
+		<main>
+			<article>
+
+	<div class="center">
+		<h1>Building a simple Swing GUI using the MVC design pattern</h1>
+		<time>June 28, 2017</time>
+	</div>
+
+	<div class="divider"></div>
+
+	<p>I’m learning how to build a simple Swing GUI in Java using the MVC design pattern.</p>
+
+<p><em>Note: I’m unsure if MVC is the correct name for the design pattern. I see conflicting explanations. Some say it is MVC. Some say that it’s PAC, what inexperienced programmers accidentally ended up with when they tried to implement MVC. Some say that since a web application doesn’t map nicely to either MVC or PAC, it’s a sort of hybrid pattern. When I figure this out, I’ll edit the post.</em></p>
+
+<h3 id="what-is-mvc">What is MVC?</h3>
+
+<p>Model-View-Controller (MVC) is a pattern for organizing code in applications that implement user interfaces. MVC achieves its organization by separating the application code into three components: the Model, the View, and the Controller.</p>
+
+<p><u>Components:</u></p>
+
+<p><strong>Model</strong> — contains the data and the methods needed to manipulate the data.</p>
+
+<p><strong>View</strong> — contains the interface that the outside world sees and interacts with.</p>
+
+<p><strong>Controller</strong> — coordinates interactions between the Model and the View.</p>
+
+<p><u>Interactions between the components:</u></p>
+
+<p><img src="/assets/06-28-17/mvc.png" alt="mvc diagram of interactions" class="center-image" /></p>
+
+<p>The key to the MVC pattern is the <em>direction</em> in which instructions flow. The View and the Model are both “dumb”; they don’t know about the existence of anything outside of themselves. Neither component ever sends instructions out. The Controller is the master; it is in command of everything. All instructions flow from it.</p>
+
+<p>Although the View and Model don’t send instructions, they can notify the Controller in event-driven systems when information changes. The Controller listens for such notifications and defines the actions that the View and Model will execute in response. It does this by defining and passing listeners to the View and Model, which should provide methods that take the listeners as parameters and attach them to the appropriate objects.</p>
+
+<p>This separateness makes for maintainable code, since the programmer can go in to change only one part, without breaking apart the entire program.</p>
+
+<p>In fact, the test of a true MVC design is whether the program is fully functional even without the View and Controller. Yes, the outside world probably will have trouble interacting with the program in that form, but as long as one knows the Model’s API, the program should hold and manipulate data as it would with a View and Controller.</p>
+
+<h3 id="a-simple-swing-gui-that-uses-the-mvc-design-pattern">A simple Swing GUI that uses the MVC design pattern</h3>
+
+<p>Following Derek Banas’ <a href="https://www.youtube.com/watch?v=dTVVa2gfht8">YouTube tutorial</a>, I built a simple calculator with Swing and MVC that lets the user enter two numbers, press a button to add the numbers, and view the sum.</p>
+
+<p><img src="/assets/06-28-17/derek banas mvc.png" alt="Derek Banas' calculator" class="center-image" /></p>
+
+<p>The package structure:</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>mvc_tutorial
+    |_ MVCCalculator.java   
+    |_ CalculatorModel.java 
+    |_ CalculatorView.java
+    |_ CalculatorController.java  
+</code></pre>
+</div>
+
+<p><code class="highlighter-rouge">CalculatorModel.java</code> contains the model, <code class="highlighter-rouge">CalculatorView.java</code> the view, and <code class="highlighter-rouge">CalculatorController.java</code> the controller. <code class="highlighter-rouge">MVCCalculator.java</code> launches the program.</p>
+
+<p>MVCCalculator.java:</p>
+
+<div class="language-java highlighter-rouge"><pre class="highlight"><code><span class="kn">package</span> <span class="n">mvc_tutorial</span><span class="o">;</span>
+
+<span class="cm">/**
+ * 
+ * Runs the MVC. 
+ *
+ */</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">MVCCalculator</span> <span class="o">{</span>
+    <span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">main</span><span class="o">(</span><span class="n">String</span><span class="o">[]</span> <span class="n">args</span><span class="o">)</span> <span class="o">{</span>
+        <span class="c1">// Create the View</span>
+        <span class="n">CalculatorView</span> <span class="n">theView</span> <span class="o">=</span> <span class="k">new</span> <span class="n">CalculatorView</span><span class="o">();</span>
+        <span class="c1">// Create the Model</span>
+        <span class="n">CalculatorModel</span> <span class="n">theModel</span> <span class="o">=</span> <span class="k">new</span> <span class="n">CalculatorModel</span><span class="o">();</span>
+        <span class="c1">// Create the Controller</span>
+        <span class="n">CalculatorController</span> <span class="n">theController</span> <span class="o">=</span> <span class="k">new</span> <span class="n">CalculatorController</span><span class="o">(</span><span class="n">theView</span><span class="o">,</span> <span class="n">theModel</span><span class="o">);</span>
+        <span class="c1">// Show the view on the screen</span>
+        <span class="n">theView</span><span class="o">.</span><span class="na">setVisible</span><span class="o">(</span><span class="kc">true</span><span class="o">);</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+</code></pre>
+</div>
+
+<p>CalculatorModel.java:</p>
+
+<div class="language-java highlighter-rouge"><pre class="highlight"><code><span class="kn">package</span> <span class="n">mvc_tutorial</span><span class="o">;</span>
+
+<span class="cm">/**
+ * 
+ * Contains the data and the methods needed to manipulate the data.
+ *
+ */</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">CalculatorModel</span> <span class="o">{</span>
+    <span class="c1">// The sum of the numbers entered in the view</span>
+    <span class="kd">private</span> <span class="kt">int</span> <span class="n">calculationValue</span><span class="o">;</span>
+    
+    <span class="c1">// Perform a calculation</span>
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">addTwoNumbers</span><span class="o">(</span><span class="kt">int</span> <span class="n">firstNumber</span><span class="o">,</span> <span class="kt">int</span> <span class="n">secondNumber</span><span class="o">)</span> <span class="o">{</span>
+        <span class="n">calculationValue</span> <span class="o">=</span> <span class="n">firstNumber</span> <span class="o">+</span> <span class="n">secondNumber</span><span class="o">;</span>
+    <span class="o">}</span>
+    
+    <span class="c1">// Provide access to data</span>
+    <span class="kd">public</span> <span class="kt">int</span> <span class="nf">getCalculation</span><span class="o">()</span> <span class="o">{</span>
+        <span class="k">return</span> <span class="n">calculationValue</span><span class="o">;</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+</code></pre>
+</div>
+
+<p>CalculatorView.java:</p>
+
+<div class="language-java highlighter-rouge"><pre class="highlight"><code><span class="kn">package</span> <span class="n">mvc_tutorial</span><span class="o">;</span>
+
+<span class="kn">import</span> <span class="nn">java.awt.event.ActionListener</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">javax.swing.*</span><span class="o">;</span>
+
+<span class="cm">/**
+ * 
+ * Contains the interface (GUI) that the outside world sees and interacts with.
+ *
+ */</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">CalculatorView</span> <span class="kd">extends</span> <span class="n">JFrame</span> <span class="o">{</span>
+    <span class="kd">private</span> <span class="n">JTextField</span> <span class="n">firstNumber</span> <span class="o">=</span> <span class="k">new</span> <span class="n">JTextField</span><span class="o">(</span><span class="mi">10</span><span class="o">);</span>
+    <span class="kd">private</span> <span class="n">JLabel</span> <span class="n">additionLabel</span> <span class="o">=</span> <span class="k">new</span> <span class="n">JLabel</span><span class="o">(</span><span class="s">"+"</span><span class="o">);</span>
+    <span class="kd">private</span> <span class="n">JTextField</span> <span class="n">secondNumber</span> <span class="o">=</span> <span class="k">new</span> <span class="n">JTextField</span><span class="o">(</span><span class="mi">10</span><span class="o">);</span>
+    <span class="kd">private</span> <span class="n">JButton</span> <span class="n">calculateButton</span> <span class="o">=</span> <span class="k">new</span> <span class="n">JButton</span><span class="o">(</span><span class="s">"Calculate"</span><span class="o">);</span>
+    <span class="kd">private</span> <span class="n">JTextField</span> <span class="n">calcSolution</span> <span class="o">=</span> <span class="k">new</span> <span class="n">JTextField</span><span class="o">(</span><span class="mi">10</span><span class="o">);</span>
+    
+    <span class="c1">// Set up the view and add the components</span>
+    <span class="n">CalculatorView</span><span class="o">()</span> <span class="o">{</span>
+        <span class="n">JPanel</span> <span class="n">calcPanel</span> <span class="o">=</span> <span class="k">new</span> <span class="n">JPanel</span><span class="o">();</span>
+        
+        <span class="k">this</span><span class="o">.</span><span class="na">setDefaultCloseOperation</span><span class="o">(</span><span class="n">JFrame</span><span class="o">.</span><span class="na">EXIT_ON_CLOSE</span><span class="o">);</span>
+        <span class="k">this</span><span class="o">.</span><span class="na">setSize</span><span class="o">(</span><span class="mi">600</span><span class="o">,</span> <span class="mi">200</span><span class="o">);</span>
+        
+        <span class="n">calcPanel</span><span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="n">firstNumber</span><span class="o">);</span>
+        <span class="n">calcPanel</span><span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="n">additionLabel</span><span class="o">);</span>
+        <span class="n">calcPanel</span><span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="n">secondNumber</span><span class="o">);</span>
+        <span class="n">calcPanel</span><span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="n">calculateButton</span><span class="o">);</span>
+        <span class="n">calcPanel</span><span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="n">calcSolution</span><span class="o">);</span>
+        
+        <span class="k">this</span><span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="n">calcPanel</span><span class="o">);</span>
+    <span class="o">}</span>
+    
+    <span class="kd">public</span> <span class="kt">int</span> <span class="nf">getFirstNumber</span><span class="o">()</span> <span class="o">{</span>
+        <span class="k">return</span> <span class="n">Integer</span><span class="o">.</span><span class="na">parseInt</span><span class="o">(</span><span class="n">firstNumber</span><span class="o">.</span><span class="na">getText</span><span class="o">());</span>
+    <span class="o">}</span>
+    
+    <span class="kd">public</span> <span class="kt">int</span> <span class="nf">getSecondNumber</span><span class="o">()</span> <span class="o">{</span>
+        <span class="k">return</span> <span class="n">Integer</span><span class="o">.</span><span class="na">parseInt</span><span class="o">(</span><span class="n">secondNumber</span><span class="o">.</span><span class="na">getText</span><span class="o">());</span>
+    <span class="o">}</span>
+    
+    <span class="kd">public</span> <span class="kt">int</span> <span class="nf">getCalcSolution</span><span class="o">()</span> <span class="o">{</span>
+        <span class="k">return</span> <span class="n">Integer</span><span class="o">.</span><span class="na">parseInt</span><span class="o">(</span><span class="n">calcSolution</span><span class="o">.</span><span class="na">getText</span><span class="o">());</span>
+    <span class="o">}</span>
+    
+    <span class="c1">// Set solution</span>
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">setCalcSolution</span><span class="o">(</span><span class="kt">int</span> <span class="n">solution</span><span class="o">)</span> <span class="o">{</span>
+        <span class="n">calcSolution</span><span class="o">.</span><span class="na">setText</span><span class="o">(</span><span class="n">Integer</span><span class="o">.</span><span class="na">toString</span><span class="o">(</span><span class="n">solution</span><span class="o">));</span>
+    <span class="o">}</span>
+    
+    <span class="c1">// If the calculateButton is clicked, execute listener's actionPerformed method</span>
+    <span class="kt">void</span> <span class="nf">addCalculateListener</span><span class="o">(</span><span class="n">ActionListener</span> <span class="n">listener</span><span class="o">)</span> <span class="o">{</span>
+        <span class="n">calculateButton</span><span class="o">.</span><span class="na">addActionListener</span><span class="o">(</span><span class="n">listener</span><span class="o">);</span>
+    <span class="o">}</span>
+    
+    <span class="c1">// Open a popup that contains the error message passed</span>
+    <span class="kt">void</span> <span class="nf">displayErrorMessage</span><span class="o">(</span><span class="n">String</span> <span class="n">errorMessage</span><span class="o">)</span> <span class="o">{</span>
+        <span class="n">JOptionPane</span><span class="o">.</span><span class="na">showMessageDialog</span><span class="o">(</span><span class="k">this</span><span class="o">,</span> <span class="n">errorMessage</span><span class="o">);</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+</code></pre>
+</div>
+
+<p>CalculatorController.java:</p>
+
+<div class="language-java highlighter-rouge"><pre class="highlight"><code><span class="kn">package</span> <span class="n">mvc_tutorial</span><span class="o">;</span>
+
+<span class="kn">import</span> <span class="nn">java.awt.event.ActionEvent</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">java.awt.event.ActionListener</span><span class="o">;</span>
+
+<span class="cm">/**
+ * 
+ * Coordinates interactions between the Model and the View.
+ *
+ */</span>
+ <span class="kd">public</span> <span class="kd">class</span> <span class="nc">CalculatorController</span> <span class="o">{</span>
+    <span class="kd">private</span> <span class="n">CalculatorView</span> <span class="n">theView</span><span class="o">;</span>
+    <span class="kd">private</span> <span class="n">CalculatorModel</span> <span class="n">theModel</span><span class="o">;</span>
+    
+    <span class="kd">public</span> <span class="nf">CalculatorController</span><span class="o">(</span><span class="n">CalculatorView</span> <span class="n">view</span><span class="o">,</span> <span class="n">CalculatorModel</span> <span class="n">model</span><span class="o">)</span> <span class="o">{</span>
+        <span class="n">theView</span> <span class="o">=</span> <span class="n">view</span><span class="o">;</span>
+        <span class="n">theModel</span> <span class="o">=</span> <span class="n">model</span><span class="o">;</span>
+        
+        <span class="c1">// Tell the view that whenever the calculate button is clicked,</span>
+        <span class="c1">// to execute the actionPerformed method in the CalculateListener inner class</span>
+        <span class="n">theView</span><span class="o">.</span><span class="na">addCalculateListener</span><span class="o">(</span><span class="k">new</span> <span class="n">CalculateListener</span><span class="o">());</span>
+    <span class="o">}</span>
+    
+    <span class="c1">// inner class</span>
+    <span class="kd">class</span> <span class="nc">CalculateListener</span> <span class="kd">implements</span> <span class="n">ActionListener</span> <span class="o">{</span>
+        <span class="kd">public</span> <span class="kt">void</span> <span class="nf">actionPerformed</span><span class="o">(</span><span class="n">ActionEvent</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span>
+            <span class="kt">int</span> <span class="n">firstNumber</span><span class="o">,</span> <span class="n">secondNumber</span> <span class="o">=</span> <span class="mi">0</span><span class="o">;</span>
+            
+            <span class="c1">// Surround interactions with the view with </span>
+            <span class="c1">// a try block in case numbers weren't properly entered</span>
+            <span class="k">try</span> <span class="o">{</span>
+                <span class="n">firstNumber</span> <span class="o">=</span> <span class="n">theView</span><span class="o">.</span><span class="na">getFirstNumber</span><span class="o">();</span>
+                <span class="n">secondNumber</span> <span class="o">=</span> <span class="n">theView</span><span class="o">.</span><span class="na">getSecondNumber</span><span class="o">();</span>
+                <span class="n">theModel</span><span class="o">.</span><span class="na">addTwoNumbers</span><span class="o">(</span><span class="n">firstNumber</span><span class="o">,</span> <span class="n">secondNumber</span><span class="o">);</span>
+                <span class="n">theView</span><span class="o">.</span><span class="na">setCalcSolution</span><span class="o">(</span><span class="n">theModel</span><span class="o">.</span><span class="na">getCalculation</span><span class="o">());</span>
+            <span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="n">NumberFormatException</span> <span class="n">ex</span><span class="o">)</span> <span class="o">{</span>
+                <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="n">ex</span><span class="o">);</span>
+                <span class="n">theView</span><span class="o">.</span><span class="na">displayErrorMessage</span><span class="o">(</span><span class="s">"You need to enter 2 integers"</span><span class="o">);</span>
+            <span class="o">}</span>
+        <span class="o">}</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+</code></pre>
+</div>
+
+<p>When the user clicks the “Calculate” button, the View notifies the Controller of this user action via the <code class="highlighter-rouge">CalculateListener</code> listener. The Controller defined this listener and passed it to the View via the <code class="highlighter-rouge">addCalculateListener</code> method, which attached the listener to the button. In the listener’s <code class="highlighter-rouge">actionPerformed</code> method, the Controller retrieves the number that the user entered, instructs the Model to add them, and retrieves the sum, telling the View to display it.</p>
+
+
+    <!--DISQUS-->
+    
+    <div id="disqus_thread"></div>
+    <script>
+        var disqus_config = function () {
+        this.page.url = "http://briennakh.github.io/notes/learning-mvc";
+        this.page.identifier = "/notes/learning-mvc"; 
+        };
+        
+        (function() { // DON'T EDIT BELOW THIS LINE
+        var d = document, s = d.createElement('script');
+        s.src = 'https://briennakh-github-io.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', +new Date());
+        (d.head || d.body).appendChild(s);
+        })();
+    </script>
+    <noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>                          
+    
+
+</article>
+
+
+
+
+<div class="page-navigation">
+	
+    <a class="next" href="/notes/calculating-elapsed-time" title="NEXT: Measuring execution time">&lt;&lt;</a>
+		<span> &middot; </span>
+  
+		<a class="home" href="/" title="Back to Homepage">Home</a>
+  
+		<span> &middot; </span>
+    <a class="prev" href="/notes/ISTE-208-study-guide-part-2" title="PREV: ISTE-608 Study Guide, Part 2">&gt;&gt;</a>
+  
+</div>
+
+		</main>
+
+		<div class="footer">
+  <span class="block">&lt;/&gt; <a href="http://github.com/heiswayi/the-plain" title="a minimalist Jekyll theme for personal blog">The Plain theme</a> by <a href="http://heiswayi.github.io">Heiswayi Nrird</a>.</span>
+  <span class="block">&copy; 2017 Brienna Herold</span>
+</div>
+
+
+	</body>
+
+</html>

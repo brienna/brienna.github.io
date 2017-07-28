@@ -23,7 +23,7 @@ Attribute — (column) a name paired with a data type (or domain), represents a 
 
 Tuple — (row) a set of attribute values, represents an entity instance.
 
-![relational model terms](/assets/ISTE-208 study guide/relational database terms.png)
+![relational model terms](/assets/06-04-17/relational database terms.png)
 
 ### Describe and identify the difference between an Entity Class and an Entity Instance.
 
@@ -33,7 +33,7 @@ In the relational database, an entity class is mapped to a table, and an entity 
 
 ### Recognize the following, when given an ER diagram, and state what the meaning is: Entity, Attribute (simple vs composite; single-valued vs multi-valued, stored vs derived, and identifier).
 
-![types of attributes](/assets/ISTE-208 study guide/attributes.png){: .center-image }
+![types of attributes](/assets/06-04-17/attributes.png){: .center-image }
  
 Entity — Real-world object or concept. Term refers to the entity class, not the entity instance.
  
@@ -98,7 +98,7 @@ Derived attributes can be ignored, since they are not physically stored in the d
 
 <u>ER diagram, with Chen notation:</u>
 
-![types of attributes](/assets/ISTE-208 study guide/ER-diagram.png){: .center-image }
+![types of attributes](/assets/06-04-17/ER-diagram.png){: .center-image }
 
 <u>Relations:</u>
 

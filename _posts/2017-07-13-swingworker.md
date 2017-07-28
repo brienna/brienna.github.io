@@ -1,6 +1,6 @@
 ---
 layout: post
-title: "Don't block the GUI: Dealing with long-running tasks in Swing, part 1"
+title: "Don't block the GUI: Dealing with long-running tasks using a SwingWorker"
 date: 2017-07-13
 comments: true
 ---
@@ -19,7 +19,7 @@ There are three types of threads in Swing:
 
 You don't need to explicitly create these threads; they are provided by the runtime or the Swing framework. You just utilize these threads to create a responsive, maintainable Swing program.
 
-### Run a Swing program on the event dispatch thread
+### A Swing program runs on the event dispatch thread
 
 Like other standard Java programs, a Swing program starts on the initial thread. The initial thread could simply create the GUI itself, but this isn't recommended. For a Swing program, the initial thread's recommended job is to "create a Runnable object that initializes the GUI and schedule that object for execution on the event dispatch thread" [(Oracle)](https://docs.oracle.com/javase/tutorial/uiswing/concurrency/initial.html).
 
@@ -42,7 +42,7 @@ public class Main {
 }
 ```
 
-### Long-running tasks on the event dispatch thread block the GUI
+### Don't block the GUI by putting long-running tasks on the event dispatch thread 
 
 "Once the GUI is created, the program is primarily driven by GUI events, each of which causes the execution of a short task on the event dispatch thread" [(Oracle)](https://docs.oracle.com/javase/tutorial/uiswing/concurrency/initial.html). 
 
@@ -74,6 +74,7 @@ public class CounterView {
         createCountText();
         createButton();
         addComponentsToFrame();
+        frame.setVisible(true);
     }
 
     private void customizeFrame() {
@@ -118,22 +119,18 @@ public class CounterView {
         frame.add(gui);
         frame.pack();
     }
-
-    public void activate() {
-        frame.setVisible(true);
-    }
 }
 ```
 
-![frozen gui](/assets/07-13-17/frozen_gui.gif)
+![frozen gui](/assets/07-13-17/frozen_gui.gif){: .center-image}
 
 As the GIF shows, the GUI has frozen. Because there is a long-running task happening on the event dispatch thread, I am unable to resize the window or do anything with the GUI until the task has completed.
 
-### Move long-running tasks to worker threads
+### How to handle long-running tasks
 
 To avoid blocking the GUI, move a long-running task to another thread, the worker thread. 
 
-Since you can update the GUI from only the event dispatch thread, you need to faciliate communication between the worker thread and the event dispatch thread. The easiest way to do this is to use the `javax.swing.SwingWorker` class, which runs a task on a worker thread and manages the interthread communication. 
+Since you can update the GUI from only the event dispatch thread, you need to faciliate communication between the worker thread and the event dispatch thread. The easiest way to do this in Swing is to use the `javax.swing.SwingWorker` class, which runs a task on a worker thread and manages the interthread communication. 
 
 In the following code edit, the "Start counter" button action listener creates and executes an instance of `SwingWorker` from the event dispatch thread. When the user presses the button, the worker object launches a worker thread and runs the task on it, leaving the event dispatch thread unblocked.
 
@@ -150,34 +147,33 @@ private void createButton()  {
             SwingWorker<Void, Void> worker = new SwingWorker<Void, Void>() {
 
                 @Override
-                protected Void doInBackground() throws Exception {
+                protected Void doInBackground() throws InterruptedException {
                     for (int i = 0; i <= 50; i++) {
                         Thread.sleep(100);
                         System.out.println(i);
-                        text.setText(Integer.toString(i));
+                        count.setText(Integer.toString(i));
                     }
 
                     return null;
                 }
             };
 
+            button.setEnabled(false);
             // Start the worker
             worker.execute();
+            button.setEnabled(true); 
         }
     });
 }
 ```
 
-![unfrozen gui](/assets/07-13-17/unfrozen_gui.gif)
+![unfrozen gui](/assets/07-13-17/unfrozen_gui.gif){: .center-image}
 
 As the GIF shows, the GUI does not freeze, because the long-running task has been moved to a worker thread. 
 
-**Notes about `SwingWorker`:**
+Note about `SwingWorker`: Each long-running task gets its own `SwingWorker` worker, and each worker can be used only once. 
 
-- `SwingWorker` is an abstract class, so you must define a subclass before you can create a `SwingWorker` object. 
-- Each long-running task gets its own `SwingWorker` object.
-- Each `SwingWorker` object can be used only once. 
-- The anatomy of a `SwingWorker` object is beyond the scope of this article; it will be discussed in a follow-up article.
+*Note about the GIFs: The GIFs don't show the button becoming disabled after the click, because this edit occurred after the GIFs' creation.*
 
 ### Troubleshooting
 

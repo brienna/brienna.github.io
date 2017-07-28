@@ -7,10 +7,24 @@
     
       
         <item>
-          <title>Using the MVC pattern to organize code containing a SwingWorker without losing functionality</title>
-          <description>&lt;p&gt;The model manages fundamental behaviors and data of the application. It can respond to requests for information, respond to instructions to change the state of its information, and even to notify observers in event-driven systems when information changes.&lt;/p&gt;
+          <title>Where to invoke a SwingWorker in the MVC pattern</title>
+          <description>&lt;p&gt;In a previous &lt;a href=&quot;http://briennakh.github.io/notes/learning-mvc&quot;&gt;post&lt;/a&gt;, I explain what I learned about building a simple Swing GUI using the MVC design pattern. When I began working with SwingWorkers though, I found myself unsure of where to invoke them in the pattern. This post addresses that question.&lt;/p&gt;
+
+&lt;p&gt;In my previous post, this paragraph is key:&lt;/p&gt;
+
+&lt;blockquote&gt;
+  &lt;p&gt;Although the View and Model don’t send instructions, they can notify the Controller &amp;gt;in event-driven systems when information changes. The Controller listens for such &lt;br /&gt;
+notifications and defines the actions that the View and Model will execute in 
+response. It does this by defining and passing listeners to the View and Model, 
+which should provide methods that take the listeners as parameters and attach them 
+to the appropriate objects.&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;The model manages fundamental behaviors and data of the application. It can respond to requests for information, respond to instructions to change the state of its information, and even to notify observers in event-driven systems when information changes.&lt;/p&gt;
 
 &lt;p&gt;In addition to instructing the model to return data, the Controller can also listen to the Model. The Model can contain code that fires notifications into the netherspace about any state changes. The Controller listens for specific notifications, interprets them, reflects the interpretation to the View.&lt;/p&gt;
+
+&lt;p&gt;https://stackoverflow.com/questions/45338333/why-is-my-download-progress-bar-firing-the-same-event-multiple-times/45339354#45339354&lt;/p&gt;
 
 &lt;p&gt;Blog post about separating swing worker into logic, and letting a background task that needs to publish happen in another class
 Note: Also note that in most of my more complex Swing GUI’s, I often do my file downloading in a different (model) object and create my SwingWorker in a different object still (control) from the GUI object (the view). It may seem more complicated to do it this way, but it’s a lot easier to debug, maintain and enhance my program when I do it this way, especially when I heavily use interfaces to allow me to test all program components in isolation.
@@ -18,9 +32,10 @@ Note: Also note that in most of my more complex Swing GUI’s, I often do my fil
 - SwingWorker is in Control (to delegate publish to another class, all your getData(…) method needs to do is to periodically update a class property and notify listeners. Makes it easy to decouple the logic from the presentation.&lt;/p&gt;
 
 &lt;ul&gt;
-  &lt;li&gt;https://stackoverflow.com/questions/2908306/how-to-delegate-swingworkers-publish-to-other-methods
-https://kodejava.org/how-do-i-listen-for-beans-property-change-event/&lt;/li&gt;
+  &lt;li&gt;https://stackoverflow.com/questions/2908306/how-to-delegate-swingworkers-publish-to-other-methods&lt;/li&gt;
 &lt;/ul&gt;
+
+&lt;p&gt;https://kodejava.org/how-do-i-listen-for-beans-property-change-event/&lt;/p&gt;
 
 &lt;p&gt;Figure out why so many calls to System print ln… in my progress bar?&lt;/p&gt;
 </description>
@@ -32,7 +47,7 @@ https://kodejava.org/how-do-i-listen-for-beans-property-change-event/&lt;/li&gt;
     
       
         <item>
-          <title>Don't block the GUI: Dealing with long-running tasks in Swing, part 1</title>
+          <title>Don't block the GUI: Dealing with long-running tasks using a SwingWorker</title>
           <description>&lt;p&gt;Swing is not thread-safe. Because of this, you can update the GUI from only the event dispatch thread, and not any other thread, otherwise unwanted behavior may result. If you can update the GUI from only the event dispatch thread, how do you handle long-running tasks that may lock up this thread, freezing the GUI?&lt;/p&gt;
 
 &lt;p&gt;This post explains how, using a simple counter GUI for demonstration purposes.&lt;/p&gt;
@@ -49,7 +64,7 @@ https://kodejava.org/how-do-i-listen-for-beans-property-change-event/&lt;/li&gt;
 
 &lt;p&gt;You don’t need to explicitly create these threads; they are provided by the runtime or the Swing framework. You just utilize these threads to create a responsive, maintainable Swing program.&lt;/p&gt;
 
-&lt;h3 id=&quot;run-a-swing-program-on-the-event-dispatch-thread&quot;&gt;Run a Swing program on the event dispatch thread&lt;/h3&gt;
+&lt;h3 id=&quot;a-swing-program-runs-on-the-event-dispatch-thread&quot;&gt;A Swing program runs on the event dispatch thread&lt;/h3&gt;
 
 &lt;p&gt;Like other standard Java programs, a Swing program starts on the initial thread. The initial thread could simply create the GUI itself, but this isn’t recommended. For a Swing program, the initial thread’s recommended job is to “create a Runnable object that initializes the GUI and schedule that object for execution on the event dispatch thread” &lt;a href=&quot;https://docs.oracle.com/javase/tutorial/uiswing/concurrency/initial.html&quot;&gt;(Oracle)&lt;/a&gt;.&lt;/p&gt;
 
@@ -72,7 +87,7 @@ https://kodejava.org/how-do-i-listen-for-beans-property-change-event/&lt;/li&gt;
 &lt;/code&gt;&lt;/pre&gt;
 &lt;/div&gt;
 
-&lt;h3 id=&quot;long-running-tasks-on-the-event-dispatch-thread-block-the-gui&quot;&gt;Long-running tasks on the event dispatch thread block the GUI&lt;/h3&gt;
+&lt;h3 id=&quot;dont-block-the-gui-by-putting-long-running-tasks-on-the-event-dispatch-thread&quot;&gt;Don’t block the GUI by putting long-running tasks on the event dispatch thread&lt;/h3&gt;
 
 &lt;p&gt;“Once the GUI is created, the program is primarily driven by GUI events, each of which causes the execution of a short task on the event dispatch thread” &lt;a href=&quot;https://docs.oracle.com/javase/tutorial/uiswing/concurrency/initial.html&quot;&gt;(Oracle)&lt;/a&gt;.&lt;/p&gt;
 
@@ -103,6 +118,7 @@ https://kodejava.org/how-do-i-listen-for-beans-property-change-event/&lt;/li&gt;
         &lt;span class=&quot;n&quot;&gt;createCountText&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;();&lt;/span&gt;
         &lt;span class=&quot;n&quot;&gt;createButton&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;();&lt;/span&gt;
         &lt;span class=&quot;n&quot;&gt;addComponentsToFrame&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;();&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;frame&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;setVisible&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kc&quot;&gt;true&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;);&lt;/span&gt;
     &lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
 
     &lt;span class=&quot;kd&quot;&gt;private&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;void&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;customizeFrame&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;()&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
@@ -147,23 +163,19 @@ https://kodejava.org/how-do-i-listen-for-beans-property-change-event/&lt;/li&gt;
         &lt;span class=&quot;n&quot;&gt;frame&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;add&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;gui&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;);&lt;/span&gt;
         &lt;span class=&quot;n&quot;&gt;frame&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;pack&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;();&lt;/span&gt;
     &lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
-
-    &lt;span class=&quot;kd&quot;&gt;public&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;void&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;activate&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;()&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
-        &lt;span class=&quot;n&quot;&gt;frame&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;setVisible&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kc&quot;&gt;true&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;);&lt;/span&gt;
-    &lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
 &lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;
 &lt;/div&gt;
 
-&lt;p&gt;&lt;img src=&quot;/assets/07-13-17/frozen_gui.gif&quot; alt=&quot;frozen gui&quot; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;/assets/07-13-17/frozen_gui.gif&quot; alt=&quot;frozen gui&quot; class=&quot;center-image&quot; /&gt;&lt;/p&gt;
 
 &lt;p&gt;As the GIF shows, the GUI has frozen. Because there is a long-running task happening on the event dispatch thread, I am unable to resize the window or do anything with the GUI until the task has completed.&lt;/p&gt;
 
-&lt;h3 id=&quot;move-long-running-tasks-to-worker-threads&quot;&gt;Move long-running tasks to worker threads&lt;/h3&gt;
+&lt;h3 id=&quot;how-to-handle-long-running-tasks&quot;&gt;How to handle long-running tasks&lt;/h3&gt;
 
 &lt;p&gt;To avoid blocking the GUI, move a long-running task to another thread, the worker thread.&lt;/p&gt;
 
-&lt;p&gt;Since you can update the GUI from only the event dispatch thread, you need to faciliate communication between the worker thread and the event dispatch thread. The easiest way to do this is to use the &lt;code class=&quot;highlighter-rouge&quot;&gt;javax.swing.SwingWorker&lt;/code&gt; class, which runs a task on a worker thread and manages the interthread communication.&lt;/p&gt;
+&lt;p&gt;Since you can update the GUI from only the event dispatch thread, you need to faciliate communication between the worker thread and the event dispatch thread. The easiest way to do this in Swing is to use the &lt;code class=&quot;highlighter-rouge&quot;&gt;javax.swing.SwingWorker&lt;/code&gt; class, which runs a task on a worker thread and manages the interthread communication.&lt;/p&gt;
 
 &lt;p&gt;In the following code edit, the “Start counter” button action listener creates and executes an instance of &lt;code class=&quot;highlighter-rouge&quot;&gt;SwingWorker&lt;/code&gt; from the event dispatch thread. When the user presses the button, the worker object launches a worker thread and runs the task on it, leaving the event dispatch thread unblocked.&lt;/p&gt;
 
@@ -179,37 +191,34 @@ https://kodejava.org/how-do-i-listen-for-beans-property-change-event/&lt;/li&gt;
             &lt;span class=&quot;n&quot;&gt;SwingWorker&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Void&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Void&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;worker&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;new&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;SwingWorker&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Void&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Void&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;gt;()&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
 
                 &lt;span class=&quot;nd&quot;&gt;@Override&lt;/span&gt;
-                &lt;span class=&quot;kd&quot;&gt;protected&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Void&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;doInBackground&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;()&lt;/span&gt; &lt;span class=&quot;kd&quot;&gt;throws&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Exception&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
+                &lt;span class=&quot;kd&quot;&gt;protected&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Void&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;doInBackground&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;()&lt;/span&gt; &lt;span class=&quot;kd&quot;&gt;throws&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;InterruptedException&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
                     &lt;span class=&quot;k&quot;&gt;for&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;int&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;i&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;i&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;lt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;50&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;i&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;++)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
                         &lt;span class=&quot;n&quot;&gt;Thread&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;sleep&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;100&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;);&lt;/span&gt;
                         &lt;span class=&quot;n&quot;&gt;System&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;out&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;println&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;i&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;);&lt;/span&gt;
-                        &lt;span class=&quot;n&quot;&gt;text&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;setText&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Integer&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;toString&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;i&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;));&lt;/span&gt;
+                        &lt;span class=&quot;n&quot;&gt;count&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;setText&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Integer&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;toString&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;i&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;));&lt;/span&gt;
                     &lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
 
                     &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;kc&quot;&gt;null&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;;&lt;/span&gt;
                 &lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
             &lt;span class=&quot;o&quot;&gt;};&lt;/span&gt;
 
+            &lt;span class=&quot;n&quot;&gt;button&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;setEnabled&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kc&quot;&gt;false&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;);&lt;/span&gt;
             &lt;span class=&quot;c1&quot;&gt;// Start the worker&lt;/span&gt;
             &lt;span class=&quot;n&quot;&gt;worker&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;execute&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;();&lt;/span&gt;
+            &lt;span class=&quot;n&quot;&gt;button&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;setEnabled&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kc&quot;&gt;true&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;);&lt;/span&gt; 
         &lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
     &lt;span class=&quot;o&quot;&gt;});&lt;/span&gt;
 &lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;
 &lt;/div&gt;
 
-&lt;p&gt;&lt;img src=&quot;/assets/07-13-17/unfrozen_gui.gif&quot; alt=&quot;unfrozen gui&quot; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;/assets/07-13-17/unfrozen_gui.gif&quot; alt=&quot;unfrozen gui&quot; class=&quot;center-image&quot; /&gt;&lt;/p&gt;
 
 &lt;p&gt;As the GIF shows, the GUI does not freeze, because the long-running task has been moved to a worker thread.&lt;/p&gt;
 
-&lt;p&gt;&lt;strong&gt;Notes about &lt;code class=&quot;highlighter-rouge&quot;&gt;SwingWorker&lt;/code&gt;:&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;Note about &lt;code class=&quot;highlighter-rouge&quot;&gt;SwingWorker&lt;/code&gt;: Each long-running task gets its own &lt;code class=&quot;highlighter-rouge&quot;&gt;SwingWorker&lt;/code&gt; worker, and each worker can be used only once.&lt;/p&gt;
 
-&lt;ul&gt;
-  &lt;li&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;SwingWorker&lt;/code&gt; is an abstract class, so you must define a subclass before you can create a &lt;code class=&quot;highlighter-rouge&quot;&gt;SwingWorker&lt;/code&gt; object.&lt;/li&gt;
-  &lt;li&gt;Each long-running task gets its own &lt;code class=&quot;highlighter-rouge&quot;&gt;SwingWorker&lt;/code&gt; object.&lt;/li&gt;
-  &lt;li&gt;Each &lt;code class=&quot;highlighter-rouge&quot;&gt;SwingWorker&lt;/code&gt; object can be used only once.&lt;/li&gt;
-  &lt;li&gt;The anatomy of a &lt;code class=&quot;highlighter-rouge&quot;&gt;SwingWorker&lt;/code&gt; object is beyond the scope of this article; it will be discussed in a follow-up article.&lt;/li&gt;
-&lt;/ul&gt;
+&lt;p&gt;&lt;em&gt;Note about the GIFs: The GIFs don’t show the button becoming disabled after the click, because this edit occurred after the GIFs’ creation.&lt;/em&gt;&lt;/p&gt;
 
 &lt;h3 id=&quot;troubleshooting&quot;&gt;Troubleshooting&lt;/h3&gt;
 
