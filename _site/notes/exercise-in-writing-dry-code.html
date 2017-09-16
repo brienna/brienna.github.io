@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+
+	<head>
+		<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+
+	<title>An exercise in writing dry code · briennakh</title>
+
+
+<meta name="twitter:card" content="summary" />
+<meta name="twitter:site" content="@briennakh" />
+<meta name="twitter:title" content="An exercise in writing dry code" />
+<meta name="twitter:description" content="In ISTE-200, I wrote a program, OrderNumbers.java, that accepts three integers from the user as three separate variables and sorts and prints the numbers in ascending numerical order, using only if...">
+
+<meta name="description" content="In ISTE-200, I wrote a program, OrderNumbers.java, that accepts three integers from the user as three separate variables and sorts and prints the numbers in ...">
+
+
+	<meta name="google-site-verification" content="epFgX0s_0RM3CdjwFcsewfXzPov2g8s9ZBOLyaIUH-o">
+
+
+<link rel="icon" href="/assets/favicon.png">
+<link rel="apple-touch-icon" href="/assets/touch-icon.png">
+<link rel="stylesheet" href="/assets/core.css">
+<link rel="canonical" href="/notes/exercise-in-writing-dry-code">
+<link rel="alternate" type="application/atom+xml" title="briennakh" href="/feed.xml" />
+
+
+
+
+<script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+
+	</head>
+
+	<body>
+
+		<aside class="logo">
+
+	
+
+	<a href="/">
+		<img src="http://www.gravatar.com/avatar/a1874522e5d9bff764e068c928f0e3c0.png?s=80" class="gravatar">
+	</a>
+	<span class="logo-prompt">Back to Home</span>
+
+</aside>
+
+
+		<main>
+			<article>
+
+	<div class="center">
+		<h1>An exercise in writing dry code</h1>
+		<time>September 15, 2017</time>
+	</div>
+
+	<div class="divider"></div>
+
+	<p>In ISTE-200, I wrote a program, <code class="highlighter-rouge">OrderNumbers.java</code>, that accepts three integers from the user as three separate variables and sorts and prints the numbers in ascending numerical order, using only if statements and no arrays.</p>
+
+<p>The final version of my code:</p>
+
+<div class="language-java highlighter-rouge"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">java.util.Scanner</span><span class="o">;</span>
+
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">OrderNumbers</span> <span class="o">{</span>
+
+    <span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">main</span><span class="o">(</span><span class="n">String</span><span class="o">[]</span> <span class="n">args</span><span class="o">)</span> <span class="o">{</span>
+        <span class="n">Scanner</span> <span class="n">scan</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Scanner</span><span class="o">(</span><span class="n">System</span><span class="o">.</span><span class="na">in</span><span class="o">);</span>
+
+        <span class="c1">// Declare and initialize all variables</span>
+        <span class="kt">int</span> <span class="n">num1</span> <span class="o">=</span> <span class="mi">0</span><span class="o">;</span>
+        <span class="kt">int</span> <span class="n">num2</span> <span class="o">=</span> <span class="mi">0</span><span class="o">;</span>
+        <span class="kt">int</span> <span class="n">num3</span> <span class="o">=</span> <span class="mi">0</span><span class="o">;</span>
+        <span class="kt">int</span> <span class="n">temp</span> <span class="o">=</span> <span class="mi">0</span><span class="o">;</span>  <span class="c1">// for sorting numbers</span>
+        <span class="kt">int</span> <span class="n">count</span> <span class="o">=</span> <span class="mi">0</span><span class="o">;</span>  <span class="c1">// for keeping track of user input</span>
+
+        <span class="k">while</span> <span class="o">(</span><span class="kc">true</span><span class="o">)</span> <span class="o">{</span>
+            <span class="c1">// If user has entered 3 valid numbers, break loop</span>
+            <span class="k">if</span> <span class="o">(</span><span class="n">pointer</span> <span class="o">&gt;</span> <span class="mi">3</span><span class="o">)</span> <span class="o">{</span>
+                <span class="k">break</span><span class="o">;</span>
+            <span class="o">}</span>
+
+            <span class="c1">// Prompt user to input a number</span>
+            <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">print</span><span class="o">(</span><span class="s">"Enter number: "</span><span class="o">);</span>
+
+            <span class="c1">// If input is invalid, notify user</span>
+            <span class="k">if</span> <span class="o">(!</span><span class="n">scan</span><span class="o">.</span><span class="na">hasNextInt</span><span class="o">())</span> <span class="o">{</span>
+                <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">"Invalid input."</span><span class="o">);</span>
+            <span class="o">}</span> <span class="k">else</span> <span class="o">{</span>
+                <span class="c1">// Otherwise assign input to appropriate variable</span>
+                <span class="k">if</span> <span class="o">(</span><span class="n">pointer</span> <span class="o">==</span> <span class="mi">1</span><span class="o">)</span> <span class="o">{</span>
+                    <span class="n">num1</span> <span class="o">=</span> <span class="n">scan</span><span class="o">.</span><span class="na">nextInt</span><span class="o">();</span>
+                <span class="o">}</span> <span class="k">else</span> <span class="k">if</span> <span class="o">(</span><span class="n">pointer</span> <span class="o">==</span> <span class="mi">2</span><span class="o">)</span> <span class="o">{</span>
+                    <span class="n">num2</span> <span class="o">=</span> <span class="n">scan</span><span class="o">.</span><span class="na">nextInt</span><span class="o">();</span>
+                <span class="o">}</span> <span class="k">else</span> <span class="k">if</span> <span class="o">(</span><span class="n">pointer</span> <span class="o">==</span> <span class="mi">3</span><span class="o">)</span> <span class="o">{</span>
+                    <span class="n">num3</span> <span class="o">=</span> <span class="n">scan</span><span class="o">.</span><span class="na">nextInt</span><span class="o">();</span>
+                <span class="o">}</span> 
+                <span class="n">pointer</span><span class="o">++;</span>
+            <span class="o">}</span>
+            <span class="n">scan</span><span class="o">.</span><span class="na">nextLine</span><span class="o">();</span>  <span class="c1">// eats line</span>
+        <span class="o">}</span>
+        
+        <span class="c1">// Sort numbers in ascending order</span>
+        <span class="k">if</span> <span class="o">(</span><span class="n">num1</span> <span class="o">&gt;</span> <span class="n">num2</span><span class="o">)</span> <span class="o">{</span>
+            <span class="n">temp</span> <span class="o">=</span> <span class="n">num1</span><span class="o">;</span>
+            <span class="n">num1</span> <span class="o">=</span> <span class="n">num2</span><span class="o">;</span>
+            <span class="n">num2</span> <span class="o">=</span> <span class="n">temp</span><span class="o">;</span>
+        <span class="o">}</span> 
+        <span class="k">if</span> <span class="o">(</span><span class="n">num2</span> <span class="o">&gt;</span> <span class="n">num3</span><span class="o">)</span> <span class="o">{</span>
+            <span class="n">temp</span> <span class="o">=</span> <span class="n">num2</span><span class="o">;</span> 
+            <span class="n">num2</span> <span class="o">=</span> <span class="n">num3</span><span class="o">;</span>
+            <span class="n">num3</span> <span class="o">=</span> <span class="n">temp</span><span class="o">;</span>
+        <span class="o">}</span>
+        <span class="k">if</span> <span class="o">(</span><span class="n">num1</span> <span class="o">&gt;</span> <span class="n">num2</span><span class="o">)</span> <span class="o">{</span>
+            <span class="n">temp</span> <span class="o">=</span> <span class="n">num1</span><span class="o">;</span>
+            <span class="n">num1</span> <span class="o">=</span> <span class="n">num2</span><span class="o">;</span>
+            <span class="n">num2</span> <span class="o">=</span> <span class="n">temp</span><span class="o">;</span>
+        <span class="o">}</span>
+
+        <span class="c1">// Print the ordered numbers</span>
+        <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">"Ordered numbers are: "</span> <span class="o">+</span> <span class="n">num1</span> <span class="o">+</span> <span class="s">", "</span> <span class="o">+</span> 
+            <span class="n">num2</span> <span class="o">+</span> <span class="s">", "</span> <span class="o">+</span> <span class="n">num3</span><span class="o">);</span>
+
+    <span class="o">}</span>
+
+<span class="o">}</span>
+</code></pre>
+</div>
+
+<p>It took me a while to code the part that checks whether the user input is valid, and if it isn’t, to continue prompting the user for a valid input. The final version of my code makes use of the best approach I could come up with without using an array.</p>
+
+<p>This was my first approach:</p>
+
+<div class="language-java highlighter-rouge"><pre class="highlight"><code><span class="c1">// Prompt user to input numbers while checking validity</span>
+<span class="k">while</span> <span class="o">(</span><span class="kc">true</span><span class="o">)</span> <span class="o">{</span>
+    <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">print</span><span class="o">(</span><span class="s">"Enter number: "</span><span class="o">);</span>
+    <span class="k">if</span> <span class="o">(!</span><span class="n">scan</span><span class="o">.</span><span class="na">hasNextInt</span><span class="o">())</span> <span class="o">{</span>
+        <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">"Invalid input"</span><span class="o">);</span>
+        <span class="n">scan</span><span class="o">.</span><span class="na">nextLine</span><span class="o">();</span> <span class="c1">// eats line</span>
+    <span class="o">}</span> <span class="k">else</span> <span class="o">{</span>
+        <span class="n">num1</span> <span class="o">=</span> <span class="n">scan</span><span class="o">.</span><span class="na">nextInt</span><span class="o">();</span>
+        <span class="k">break</span><span class="o">;</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+<span class="k">while</span> <span class="o">(</span><span class="kc">true</span><span class="o">)</span> <span class="o">{</span>
+    <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">print</span><span class="o">(</span><span class="s">"Enter number: "</span><span class="o">);</span>
+    <span class="k">if</span> <span class="o">(!</span><span class="n">scan</span><span class="o">.</span><span class="na">hasNextInt</span><span class="o">())</span> <span class="o">{</span>
+        <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">"Invalid input"</span><span class="o">);</span>
+        <span class="n">scan</span><span class="o">.</span><span class="na">nextLine</span><span class="o">();</span> 
+    <span class="o">}</span> <span class="k">else</span> <span class="o">{</span>
+        <span class="n">num2</span> <span class="o">=</span> <span class="n">scan</span><span class="o">.</span><span class="na">nextInt</span><span class="o">();</span>
+        <span class="k">break</span><span class="o">;</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+<span class="k">while</span> <span class="o">(</span><span class="kc">true</span><span class="o">)</span> <span class="o">{</span>
+    <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">print</span><span class="o">(</span><span class="s">"Enter number: "</span><span class="o">);</span>
+    <span class="k">if</span> <span class="o">(!</span><span class="n">scan</span><span class="o">.</span><span class="na">hasNextInt</span><span class="o">())</span> <span class="o">{</span>
+        <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">"Invalid input"</span><span class="o">);</span>
+        <span class="n">scan</span><span class="o">.</span><span class="na">nextLine</span><span class="o">();</span> 
+    <span class="o">}</span> <span class="k">else</span> <span class="o">{</span>
+        <span class="n">num3</span> <span class="o">=</span> <span class="n">scan</span><span class="o">.</span><span class="na">nextInt</span><span class="o">();</span>
+        <span class="k">break</span><span class="o">;</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+</code></pre>
+</div>
+
+<p>A bit redundant, eh? To mop up this wet code, I added the variable <code class="highlighter-rouge">pointer</code> to keep track of user input for variable assignment, allowing me to reuse the same block of code to validate all user inputs.</p>
+
+
+    <!--DISQUS-->
+    
+    <div id="disqus_thread"></div>
+    <script>
+        var disqus_config = function () {
+        this.page.url = "http://briennakh.github.io/notes/exercise-in-writing-dry-code";
+        this.page.identifier = "/notes/exercise-in-writing-dry-code"; 
+        };
+        
+        (function() { // DON'T EDIT BELOW THIS LINE
+        var d = document, s = d.createElement('script');
+        s.src = 'https://briennakh-github-io.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', +new Date());
+        (d.head || d.body).appendChild(s);
+        })();
+    </script>
+    <noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>                          
+    
+
+</article>
+
+
+
+
+<div class="page-navigation">
+	
+		<a class="home" href="/" title="Back to Homepage">Home</a>
+  
+		<span> &middot; </span>
+    <a class="prev" href="/notes/swingworker-mvc-organization" title="PREV: Where to invoke a SwingWorker in the MVC pattern">&gt;&gt;</a>
+  
+</div>
+
+		</main>
+
+		<div class="footer">
+  <span class="block">&lt;/&gt; <a href="http://github.com/heiswayi/the-plain" title="a minimalist Jekyll theme for personal blog">The Plain theme</a> by <a href="http://heiswayi.github.io">Heiswayi Nrird</a>.</span>
+  <span class="block">&copy; 2017 Brienna Herold</span>
+</div>
+
+
+	</body>
+
+</html>
