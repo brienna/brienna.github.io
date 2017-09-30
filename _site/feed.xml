@@ -7,6 +7,53 @@
     
       
         <item>
+          <title>Setting up and using MySQL on MacOS</title>
+          <description>&lt;p&gt;&lt;em&gt;Notes from the first week of ISTE-608: Database Design and Implementation, during which I set up and began using MySQL on my MacBook for the first time.&lt;/em&gt;&lt;/p&gt;
+
+&lt;h2 id=&quot;downloading-and-installing-mysql&quot;&gt;Downloading and installing MySQL&lt;/h2&gt;
+
+&lt;p&gt;Download the open source MySQL Community Server (&lt;a href=&quot;https://dev.mysql.com/get/Downloads/MySQL-5.7/mysql-5.7.19-macos10.12-x86_64.dmg&quot;&gt;version 5.7.19&lt;/a&gt;) as a DMG file, open it, and double-click on the package to launch the installer.&lt;/p&gt;
+
+&lt;p&gt;During installation, a dialog will pop up to inform you of the temporary root password. Save it. If you lose it, consult the section “How to Reset the Root Password” in the &lt;a href=&quot;https://dev.mysql.com/doc/refman/5.7/en/&quot;&gt;MySQL 5.7 reference manual&lt;/a&gt;.&lt;/p&gt;
+
+&lt;h2 id=&quot;setting-up-mysql&quot;&gt;Setting up MySQL&lt;/h2&gt;
+
+&lt;p&gt;&lt;strong&gt;Set server preferences:&lt;/strong&gt;&lt;/p&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;Open System Preferences. You should notice a MySQL icon.&lt;/li&gt;
+  &lt;li&gt;Click the icon to enter the MySQL pane.&lt;/li&gt;
+  &lt;li&gt;Ensure that the checkbox to “Automatically Start MySQL Server on Startup” is checked.&lt;/li&gt;
+  &lt;li&gt;Start the server by clicking the “Start MySQL Server” button. This should be the only time you need to start the server, because you have it set up to automatically start on startup. But if you stop the server yourself, you can start it back up this way.&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;&lt;strong&gt;Change the temporary root password:&lt;/strong&gt;&lt;/p&gt;
+
+&lt;ol start=&quot;5&quot;&gt;
+  &lt;li&gt;Open a Terminal window and start a MySQL session by executing &lt;code class=&quot;highlighter-rouge&quot;&gt;/usr/local/mysql/bin/mysql -u root -p&lt;/code&gt;.&lt;/li&gt;
+  &lt;li&gt;Enter the temporary root password at the prompt. You will see a message starting with “Welcome to the MySQL monitor.”&lt;/li&gt;
+  &lt;li&gt;Execute the following ALTER USER command: &lt;code class=&quot;highlighter-rouge&quot;&gt;ALTER USER 'root'@'localhost' IDENTIFIED BY 'new_password';&lt;/code&gt;. Substitute &lt;code class=&quot;highlighter-rouge&quot;&gt;new_password&lt;/code&gt; with your new password. The single quotes need to be included.&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;h2 id=&quot;using-mysql&quot;&gt;Using MySQL&lt;/h2&gt;
+
+&lt;p&gt;To use MySQL from now on, follow steps 5 and 6 above, but using the root password that you set. You can run multiple sessions at the same time, one session per Terminal window. To quit a session, type &lt;code class=&quot;highlighter-rouge&quot;&gt;quit&lt;/code&gt; and enter.&lt;/p&gt;
+
+&lt;h3 id=&quot;useful-commands&quot;&gt;Useful commands&lt;/h3&gt;
+
+&lt;p&gt;&lt;strong&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;--tee&lt;/code&gt; or &lt;code class=&quot;highlighter-rouge&quot;&gt;\T&lt;/code&gt;:&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;This command lets you log everything that is displayed on the screen during the session. All of this data is appended to the file you specify. You can use this command when starting a session by adding the following argument: &lt;code class=&quot;highlighter-rouge&quot;&gt;--tee [absolute_path_to_log_file]&lt;/code&gt;. Or you can use it anytime during the session: &lt;code class=&quot;highlighter-rouge&quot;&gt;\T [absolute_path_to_log_file]&lt;/code&gt;.&lt;/p&gt;
+
+</description>
+          <pubDate>2017-09-30T00:00:00-04:00</pubDate>
+          <link>http://briennakh.github.io/notes/installing-and-using-mysql</link>
+          <guid isPermaLink="true">http://briennakh.github.io/notes/installing-and-using-mysql</guid>
+        </item>
+      
+    
+      
+        <item>
           <title>An exercise in writing dry code</title>
           <description>&lt;p&gt;In ISTE-200, I wrote a program, &lt;code class=&quot;highlighter-rouge&quot;&gt;OrderNumbers.java&lt;/code&gt;, that accepts three integers from the user as three separate variables and sorts and prints the numbers in ascending numerical order, using only if statements and no arrays.&lt;/p&gt;
 

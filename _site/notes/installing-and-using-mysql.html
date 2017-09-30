@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+
+	<head>
+		<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+
+	<title>Setting up and using MySQL on MacOS · briennakh</title>
+
+
+<meta name="twitter:card" content="summary" />
+<meta name="twitter:site" content="@briennakh" />
+<meta name="twitter:title" content="Setting up and using MySQL on MacOS" />
+<meta name="twitter:description" content="Notes from the first week of ISTE-608: Database Design and Implementation, during which I set up and began using MySQL on my MacBook for the first time.">
+
+<meta name="description" content="Notes from the first week of ISTE-608: Database Design and Implementation, during which I set up and began using MySQL on my MacBook for the first time.">
+
+
+	<meta name="google-site-verification" content="epFgX0s_0RM3CdjwFcsewfXzPov2g8s9ZBOLyaIUH-o">
+
+
+<link rel="icon" href="/assets/favicon.png">
+<link rel="apple-touch-icon" href="/assets/touch-icon.png">
+<link rel="stylesheet" href="/assets/core.css">
+<link rel="canonical" href="/notes/installing-and-using-mysql">
+<link rel="alternate" type="application/atom+xml" title="briennakh" href="/feed.xml" />
+
+
+
+
+<script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+
+	</head>
+
+	<body>
+
+		<aside class="logo">
+
+	
+
+	<a href="/">
+		<img src="http://www.gravatar.com/avatar/a1874522e5d9bff764e068c928f0e3c0.png?s=80" class="gravatar">
+	</a>
+	<span class="logo-prompt">Back to Home</span>
+
+</aside>
+
+
+		<main>
+			<article>
+
+	<div class="center">
+		<h1>Setting up and using MySQL on MacOS</h1>
+		<time>September 30, 2017</time>
+	</div>
+
+	<div class="divider"></div>
+
+	<p><em>Notes from the first week of ISTE-608: Database Design and Implementation, during which I set up and began using MySQL on my MacBook for the first time.</em></p>
+
+<h2 id="downloading-and-installing-mysql">Downloading and installing MySQL</h2>
+
+<p>Download the open source MySQL Community Server (<a href="https://dev.mysql.com/get/Downloads/MySQL-5.7/mysql-5.7.19-macos10.12-x86_64.dmg">version 5.7.19</a>) as a DMG file, open it, and double-click on the package to launch the installer.</p>
+
+<p>During installation, a dialog will pop up to inform you of the temporary root password. Save it. If you lose it, consult the section “How to Reset the Root Password” in the <a href="https://dev.mysql.com/doc/refman/5.7/en/">MySQL 5.7 reference manual</a>.</p>
+
+<h2 id="setting-up-mysql">Setting up MySQL</h2>
+
+<p><strong>Set server preferences:</strong></p>
+
+<ol>
+  <li>Open System Preferences. You should notice a MySQL icon.</li>
+  <li>Click the icon to enter the MySQL pane.</li>
+  <li>Ensure that the checkbox to “Automatically Start MySQL Server on Startup” is checked.</li>
+  <li>Start the server by clicking the “Start MySQL Server” button. This should be the only time you need to start the server, because you have it set up to automatically start on startup. But if you stop the server yourself, you can start it back up this way.</li>
+</ol>
+
+<p><strong>Change the temporary root password:</strong></p>
+
+<ol start="5">
+  <li>Open a Terminal window and start a MySQL session by executing <code class="highlighter-rouge">/usr/local/mysql/bin/mysql -u root -p</code>.</li>
+  <li>Enter the temporary root password at the prompt. You will see a message starting with “Welcome to the MySQL monitor.”</li>
+  <li>Execute the following ALTER USER command: <code class="highlighter-rouge">ALTER USER 'root'@'localhost' IDENTIFIED BY 'new_password';</code>. Substitute <code class="highlighter-rouge">new_password</code> with your new password. The single quotes need to be included.</li>
+</ol>
+
+<h2 id="using-mysql">Using MySQL</h2>
+
+<p>To use MySQL from now on, follow steps 5 and 6 above, but using the root password that you set. You can run multiple sessions at the same time, one session per Terminal window. To quit a session, type <code class="highlighter-rouge">quit</code> and enter.</p>
+
+<h3 id="useful-commands">Useful commands</h3>
+
+<p><strong><code class="highlighter-rouge">--tee</code> or <code class="highlighter-rouge">\T</code>:</strong></p>
+
+<p>This command lets you log everything that is displayed on the screen during the session. All of this data is appended to the file you specify. You can use this command when starting a session by adding the following argument: <code class="highlighter-rouge">--tee [absolute_path_to_log_file]</code>. Or you can use it anytime during the session: <code class="highlighter-rouge">\T [absolute_path_to_log_file]</code>.</p>
+
+
+
+    <!--DISQUS-->
+    
+    <div id="disqus_thread"></div>
+    <script>
+        var disqus_config = function () {
+        this.page.url = "http://briennakh.github.io/notes/installing-and-using-mysql";
+        this.page.identifier = "/notes/installing-and-using-mysql"; 
+        };
+        
+        (function() { // DON'T EDIT BELOW THIS LINE
+        var d = document, s = d.createElement('script');
+        s.src = 'https://briennakh-github-io.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', +new Date());
+        (d.head || d.body).appendChild(s);
+        })();
+    </script>
+    <noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>                          
+    
+
+</article>
+
+
+
+
+<div class="page-navigation">
+	
+		<a class="home" href="/" title="Back to Homepage">Home</a>
+  
+		<span> &middot; </span>
+    <a class="prev" href="/notes/exercise-in-writing-dry-code" title="PREV: An exercise in writing dry code">&gt;&gt;</a>
+  
+</div>
+
+		</main>
+
+		<div class="footer">
+  <span class="block">&lt;/&gt; <a href="http://github.com/heiswayi/the-plain" title="a minimalist Jekyll theme for personal blog">The Plain theme</a> by <a href="http://heiswayi.github.io">Heiswayi Nrird</a>.</span>
+  <span class="block">&copy; 2017 Brienna Herold</span>
+</div>
+
+
+	</body>
+
+</html>
