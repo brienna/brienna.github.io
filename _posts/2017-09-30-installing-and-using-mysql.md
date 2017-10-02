@@ -39,3 +39,7 @@ To use MySQL from now on, follow steps 5 and 6 above, but using the root passwor
 
 This command lets you log everything that is displayed on the screen during the session. All of this data is appended to the file you specify. You can use this command when starting a session by adding the following argument: `--tee [absolute_path_to_log_file]`. Or you can use it anytime during the session: `\T [absolute_path_to_log_file]`.
 
+**`\G`:**
+
+If a table has many attributes, it can appear as a disorganized mess when printed in Terminal. There are several [solutions](https://stackoverflow.com/questions/924729/mysql-select-many-fields-how-best-to-display-in-terminal) for this. I like the ego command, which tells the server to display the table vertically. Just add on the `\G` flag in place of the `;` at the end of a SQL statement, like `SELECT * FROM table \G`.
+

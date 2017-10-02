@@ -45,6 +45,10 @@
 
 &lt;p&gt;This command lets you log everything that is displayed on the screen during the session. All of this data is appended to the file you specify. You can use this command when starting a session by adding the following argument: &lt;code class=&quot;highlighter-rouge&quot;&gt;--tee [absolute_path_to_log_file]&lt;/code&gt;. Or you can use it anytime during the session: &lt;code class=&quot;highlighter-rouge&quot;&gt;\T [absolute_path_to_log_file]&lt;/code&gt;.&lt;/p&gt;
 
+&lt;p&gt;&lt;strong&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;\G&lt;/code&gt;:&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;If a table has many attributes, it can appear as a disorganized mess when printed in Terminal. There are several &lt;a href=&quot;https://stackoverflow.com/questions/924729/mysql-select-many-fields-how-best-to-display-in-terminal&quot;&gt;solutions&lt;/a&gt; for this. I like the ego command, which tells the server to display the table vertically. Just add on the &lt;code class=&quot;highlighter-rouge&quot;&gt;\G&lt;/code&gt; flag in place of the &lt;code class=&quot;highlighter-rouge&quot;&gt;;&lt;/code&gt; at the end of a SQL statement, like &lt;code class=&quot;highlighter-rouge&quot;&gt;SELECT * FROM table \G&lt;/code&gt;.&lt;/p&gt;
+
 </description>
           <pubDate>2017-09-30T00:00:00-04:00</pubDate>
           <link>http://briennakh.github.io/notes/installing-and-using-mysql</link>

@@ -96,6 +96,10 @@
 
 <p>This command lets you log everything that is displayed on the screen during the session. All of this data is appended to the file you specify. You can use this command when starting a session by adding the following argument: <code class="highlighter-rouge">--tee [absolute_path_to_log_file]</code>. Or you can use it anytime during the session: <code class="highlighter-rouge">\T [absolute_path_to_log_file]</code>.</p>
 
+<p><strong><code class="highlighter-rouge">\G</code>:</strong></p>
+
+<p>If a table has many attributes, it can appear as a disorganized mess when printed in Terminal. There are several <a href="https://stackoverflow.com/questions/924729/mysql-select-many-fields-how-best-to-display-in-terminal">solutions</a> for this. I like the ego command, which tells the server to display the table vertically. Just add on the <code class="highlighter-rouge">\G</code> flag in place of the <code class="highlighter-rouge">;</code> at the end of a SQL statement, like <code class="highlighter-rouge">SELECT * FROM table \G</code>.</p>
+
 
 
     <!--DISQUS-->
