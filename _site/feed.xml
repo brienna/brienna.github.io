@@ -7,6 +7,61 @@
     
       
         <item>
+          <title>Java uses only &quot;pass by value&quot;</title>
+          <description>&lt;p&gt;There are two ways to pass objects, by reference or by value. To pass by reference means that you pass the reference. To pass by value means that you pass a copy of the reference.&lt;/p&gt;
+
+&lt;p&gt;Java passes by value, but this is often misunderstood. An excerpt from “Big Java” (p. 337):&lt;/p&gt;
+
+&lt;blockquote&gt;
+  &lt;p&gt;You will sometimes read in Java books that “numbers are passed by value, objects are passed by reference.” That is technically not quite correct. In Java, objects themselves are never passed as parameters; instead, both numbers and &lt;em&gt;object references&lt;/em&gt; are passed by value.&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;I had thought I understood the difference between the two ways of passing objects, but understanding it as a fact is different than understanding it in practice. Today I found myself stuck on an ISTE200 homework assignment because I tried to do something that isn’t possible with pass by value.&lt;/p&gt;
+
+&lt;p&gt;I was working on a class with several setter methods. Each setter receives an index and, if it is valid, sets an instance variable to refer to the String object found at the index of the specified array.&lt;/p&gt;
+
+&lt;p&gt;to set as an instance variable if it is a valid index in a specified array.&lt;/p&gt;
+
+&lt;p&gt;For example, &lt;code class=&quot;highlighter-rouge&quot;&gt;setEngine&lt;/code&gt; and &lt;code class=&quot;highlighter-rouge&quot;&gt;setLoad&lt;/code&gt;:&lt;/p&gt;
+
+&lt;div class=&quot;language-java highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;kd&quot;&gt;public&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;void&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;setEngine&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;int&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;index&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;index&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;amp;&amp;amp;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;index&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;ENGINES&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;length&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
+      &lt;span class=&quot;n&quot;&gt;engine&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;ENGINES&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;index&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;];&lt;/span&gt;  
+    &lt;span class=&quot;o&quot;&gt;}&lt;/span&gt; 
+&lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
+
+&lt;span class=&quot;kd&quot;&gt;public&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;void&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;setLoad&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;int&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;index&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;index&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;amp;&amp;amp;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;index&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;LOADS&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;length&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
+      &lt;span class=&quot;n&quot;&gt;load&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;LOADS&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;index&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;];&lt;/span&gt;
+    &lt;span class=&quot;o&quot;&gt;}&lt;/span&gt; 
+&lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;Both setters are similar, so I wanted to see if I could write a generic setter that receives the instance variable as a parameter:&lt;/p&gt;
+
+&lt;div class=&quot;language-java highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;kd&quot;&gt;public&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;boolean&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;setVariable&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;int&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;index&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;String&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;[]&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;list&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;String&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;var&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
+  &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;index&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;amp;&amp;amp;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;index&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;list&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;length&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;var&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;list&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;index&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;];&lt;/span&gt;  
+  &lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
+&lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;It didn’t work. &lt;code class=&quot;highlighter-rouge&quot;&gt;var&lt;/code&gt; got set, but the instance variables stayed as they were.&lt;/p&gt;
+
+&lt;p&gt;Why? &lt;strong&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;var&lt;/code&gt; is a copy of a reference, not the reference itself&lt;/strong&gt;. The instance variable stores a reference to a String object. When I pass the instance variable to &lt;code class=&quot;highlighter-rouge&quot;&gt;setVariable&lt;/code&gt;, I am assigning &lt;code class=&quot;highlighter-rouge&quot;&gt;var&lt;/code&gt; a copy of that reference. At this moment, the instance variable and &lt;code class=&quot;highlighter-rouge&quot;&gt;var&lt;/code&gt; both refer to the same object. &lt;code class=&quot;highlighter-rouge&quot;&gt;LOADS[index]&lt;/code&gt;, however, stores a reference to a different object. So when I write &lt;code class=&quot;highlighter-rouge&quot;&gt;var = LOADS[index]&lt;/code&gt;, I am replacing the reference &lt;code class=&quot;highlighter-rouge&quot;&gt;var&lt;/code&gt; currently stores with a new one. Now the instance variable and &lt;code class=&quot;highlighter-rouge&quot;&gt;var&lt;/code&gt; no longer refer to the same object. This is why the instance variable doesn’t get updated. With pass by value, a Java method can update an object’s state, but it can’t &lt;em&gt;replace&lt;/em&gt; the contents of an object reference.&lt;/p&gt;
+
+&lt;p&gt;And in this particular situation I happen to be passing a String reference. A String is immutable, meaning that there are no methods in its public API that I can call to update its state. Possible solutions are to instead pass a StringBuilder or a wrapper class containing the String reference.&lt;/p&gt;
+</description>
+          <pubDate>2017-10-04T00:00:00-04:00</pubDate>
+          <link>http://briennakh.github.io/notes/java-passes-by-value</link>
+          <guid isPermaLink="true">http://briennakh.github.io/notes/java-passes-by-value</guid>
+        </item>
+      
+    
+      
+        <item>
           <title>Setting up and using MySQL on MacOS</title>
           <description>&lt;p&gt;&lt;em&gt;Notes from the first week of ISTE-608: Database Design and Implementation, during which I set up and began using MySQL on my MacBook for the first time.&lt;/em&gt;&lt;/p&gt;
 
