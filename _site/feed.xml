@@ -7,6 +7,195 @@
     
       
         <item>
+          <title>Addressing a unchecked cast warning</title>
+          <description>&lt;p&gt;I wrote some code, so that I could, among other things, read a serialized &lt;code class=&quot;highlighter-rouge&quot;&gt;ArrayList&amp;lt;Vehicle&amp;gt;&lt;/code&gt; from an &lt;code class=&quot;highlighter-rouge&quot;&gt;ObjectInputStream&lt;/code&gt;, &lt;code class=&quot;highlighter-rouge&quot;&gt;in&lt;/code&gt;, into &lt;code class=&quot;highlighter-rouge&quot;&gt;orders&lt;/code&gt;:&lt;/p&gt;
+
+&lt;div class=&quot;language-java highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;n&quot;&gt;orders&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;ArrayList&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Vehicle&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;gt;)&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;in&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;readObject&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;();&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;But the Java compiler gives an unchecked cast warning:&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;MacBook:Homework Brienna$ javac Orders.java -Xlint:unchecked
+Orders.java:152: warning: [unchecked] unchecked cast
+                    orders = (ArrayList&amp;lt;Vehicle&amp;gt;) in.readObject();
+                                                                ^
+  required: ArrayList&amp;lt;Vehicle&amp;gt;
+  found:    Object
+1 warning
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;The problem is that a cast is a runtime check, but a generic type (the &lt;code class=&quot;highlighter-rouge&quot;&gt;&amp;lt;Vehicle&amp;gt;&lt;/code&gt; part of &lt;code class=&quot;highlighter-rouge&quot;&gt;ArrayList&amp;lt;Vehicle&amp;gt;&lt;/code&gt;) gets erased during compilation and is not available at runtime for the cast. In fact, at runtime there is no difference between an &lt;code class=&quot;highlighter-rouge&quot;&gt;ArrayList&amp;lt;Vehicle&amp;gt;&lt;/code&gt; and an &lt;code class=&quot;highlighter-rouge&quot;&gt;ArrayList&amp;lt;AnythingElse&amp;gt;&lt;/code&gt;. Because of this type erasure, I can’t check that I actually have an &lt;code class=&quot;highlighter-rouge&quot;&gt;ArrayList&amp;lt;Vehicle&amp;gt;&lt;/code&gt; when I am casting. So I need to do the check myself by looping through the ArrayList and casting each element individually:&lt;/p&gt;
+
+&lt;div class=&quot;language-java highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;n&quot;&gt;ArrayList&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;lt;?&amp;gt;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;ar&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;ArrayList&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;lt;?&amp;gt;)&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;in&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;readObject&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;();&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;for&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Object&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;x&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;ar&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;orders&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;add&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;((&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Vehicle&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;x&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;);&lt;/span&gt;
+&lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;Note: Since I have control over the objects which were originally serialized, I could avoid the loop by using an array instead of an ArrayList. Array types are always a safe cast (if they don’t have a generic type themselves).&lt;/p&gt;
+
+&lt;p&gt;More info about type erasure can be found &lt;a href=&quot;https://docs.oracle.com/javase/tutorial/java/generics/erasure.html&quot;&gt;here&lt;/a&gt; and &lt;a href=&quot;https://stackoverflow.com/questions/339699/java-generics-type-erasure-when-and-what-happens&quot;&gt;here&lt;/a&gt;.&lt;/p&gt;
+
+&lt;p&gt;The full code for this assignment can be found &lt;a href=&quot;https://github.com/briennakh/ISTE200/tree/master/Day%206/Homework&quot;&gt;here&lt;/a&gt;.&lt;/p&gt;
+</description>
+          <pubDate>2017-12-28T00:00:00-05:00</pubDate>
+          <link>http://briennakh.github.io/notes/how-to-address-unchecked-cast-warning</link>
+          <guid isPermaLink="true">http://briennakh.github.io/notes/how-to-address-unchecked-cast-warning</guid>
+        </item>
+      
+    
+      
+        <item>
+          <title>Java I/O notes</title>
+          <description>&lt;p&gt;Every time I work with I/O, I find myself looking up the same stuff, so I’ve consolidated my notes on I/O into one place here.&lt;/p&gt;
+
+&lt;h2 id=&quot;what-is-io&quot;&gt;What is I/O?&lt;/h2&gt;
+
+&lt;p&gt;I/O stands for Input/Output operations, which are reading/writing.&lt;/p&gt;
+
+&lt;p&gt;To simplify I/O, Java uses streams. A stream is an object that represents an input source or output destination. Some streams simply pass data, and others process data. As explained later, you can layer different streams into one stream to achieve the desired functionality.&lt;/p&gt;
+
+&lt;h2 id=&quot;an-overview-of-the-io-process&quot;&gt;An overview of the I/O process&lt;/h2&gt;
+
+&lt;p&gt;&lt;em&gt;Note: For the sake of clarity, I use the idea of a “file” to represent an input source or output destination. The actual of the source/destination can vary in reality.&lt;/em&gt;&lt;/p&gt;
+
+&lt;p&gt;Process:&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;open the file (that is the input source or output destination)&lt;/li&gt;
+  &lt;li&gt;read from the file / write to the file&lt;/li&gt;
+  &lt;li&gt;close the file&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;&lt;strong&gt;Open the file:&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;All of the streams are automatically opened when created.&lt;/p&gt;
+
+&lt;p&gt;When created, all streams take either a File object or the file as a string.&lt;/p&gt;
+
+&lt;p&gt;File class:
+An object represents a file. This class does not do any I/O itself.&lt;/p&gt;
+
+&lt;div class=&quot;language-java highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;n&quot;&gt;File&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;theFile&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;new&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;File&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;hello world.txt&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;);&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;Most common methods I’ve been using in the File class:&lt;/p&gt;
+
+&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;exists()&lt;/code&gt; - ensure file exists before using the File object in I/O activities.&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;Read/write&lt;/strong&gt;:&lt;/p&gt;
+
+&lt;p&gt;All streams have &lt;code class=&quot;highlighter-rouge&quot;&gt;read()&lt;/code&gt; and &lt;code class=&quot;highlighter-rouge&quot;&gt;write()&lt;/code&gt; methods.&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;Close:&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;You can close any stream explicitly by calling its close method.&lt;/p&gt;
+
+&lt;h2 id=&quot;types-of-io-streams&quot;&gt;Types of I/O streams&lt;/h2&gt;
+
+&lt;p&gt;[hierarchy]&lt;/p&gt;
+
+&lt;p&gt;Streams are either byte-oriented or character-oriented. Character streams work with character data, and byte streams work with binary data.&lt;/p&gt;
+
+&lt;p&gt;All byte streams are descended from the abstract base classes InputStream/OutputStream. All character streams are descended from the abstract base classes Reader/Writer. These base classes are where common methods like &lt;code class=&quot;highlighter-rouge&quot;&gt;read()&lt;/code&gt; and &lt;code class=&quot;highlighter-rouge&quot;&gt;write()&lt;/code&gt; are defined, for different data types.&lt;/p&gt;
+
+&lt;p&gt;Each section below discuss most commonly used streams.&lt;/p&gt;
+
+&lt;h4 id=&quot;work-directly-with-files&quot;&gt;Work directly with files&lt;/h4&gt;
+
+&lt;p&gt;Class names that start with File specialize in file I/O. They take the File object or a string representing the file name.&lt;/p&gt;
+
+&lt;p&gt;(I often use the File object, because I want to be able to check if the file exists before I open a stream on it. The File object opens the file. But if you don’t use the File object, then the file is opened when you create the stream.)&lt;/p&gt;
+
+&lt;p&gt;Character:&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;Read: &lt;code class=&quot;highlighter-rouge&quot;&gt;FileReader&lt;/code&gt;&lt;/li&gt;
+  &lt;li&gt;Write: &lt;code class=&quot;highlighter-rouge&quot;&gt;FileWriter&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;Byte:&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;Read: &lt;code class=&quot;highlighter-rouge&quot;&gt;FileInputStream&lt;/code&gt;&lt;/li&gt;
+  &lt;li&gt;Write: &lt;code class=&quot;highlighter-rouge&quot;&gt;FileOutputStream&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;Using these streams alone for file I/O is possible but not preferred.&lt;/p&gt;
+
+&lt;p&gt;To create a stream that lets you access the data in the manner you want, such as text, data stream, object, etc., it is recommended to layer two or more streams into a single stream. To layer streams, you use an object of one class as the argument for the constructor for another class. When you close the outer stream, it closes all underlying streams as well.&lt;/p&gt;
+
+&lt;p&gt;The streams above are the ones you begin with when you connect to a file. Now let’s look at streams you can use to wrap them with.&lt;/p&gt;
+
+&lt;h4 id=&quot;buffer-the-io-operations&quot;&gt;Buffer the I/O operations&lt;/h4&gt;
+
+&lt;p&gt;It is preferred to next wrap the above stream with a Buffer stream.&lt;/p&gt;
+
+&lt;p&gt;The read() and write() methods read and write single character or byte. Adding a Buffer stream changes this behavior.&lt;/p&gt;
+
+&lt;p&gt;Analogy for why this is preferred: https://medium.com/@Mz_Chi/why-you-should-use-bufferedreader-and-bufferedwriter-727614e6f9ee&lt;/p&gt;
+
+&lt;p&gt;flush. But when you close the file, &lt;code class=&quot;highlighter-rouge&quot;&gt;[stream obj].close()&lt;/code&gt;, this is now flushing automatically, so you don’t have to worry about explicitly flushing as of Java _.&lt;/p&gt;
+
+&lt;p&gt;Character:&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;Read: &lt;code class=&quot;highlighter-rouge&quot;&gt;BufferedReader&lt;/code&gt;&lt;/li&gt;
+  &lt;li&gt;Write: &lt;code class=&quot;highlighter-rouge&quot;&gt;BufferedWriter&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;Byte:&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;Read: &lt;code class=&quot;highlighter-rouge&quot;&gt;BufferedInputStream&lt;/code&gt;&lt;/li&gt;
+  &lt;li&gt;Write: &lt;code class=&quot;highlighter-rouge&quot;&gt;BufferedOutputStream&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h4 id=&quot;printwriter&quot;&gt;PrintWriter&lt;/h4&gt;
+
+&lt;h4 id=&quot;working-with-primitive-data-types&quot;&gt;Working with primitive data types&lt;/h4&gt;
+
+&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;DataInputStream&lt;/code&gt; and &lt;code class=&quot;highlighter-rouge&quot;&gt;DataOutputStream&lt;/code&gt; are the most common used streams for processing binary files. Purpose is to read/write primitive data types such as int, double, etc., without needing to parse or convert data types.&lt;/p&gt;
+
+&lt;p&gt;Useful methods to know about:&lt;/p&gt;
+
+&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;writeUTF()&lt;/code&gt; – writes strings&lt;/p&gt;
+
+&lt;p&gt;You also must know the structure of the file to know what data type to read.&lt;/p&gt;
+
+&lt;h4 id=&quot;object-streams&quot;&gt;Object streams&lt;/h4&gt;
+
+&lt;p&gt;Like data streams support I/O of primitive data types, object streams support I/O of objects. Object streams are &lt;code class=&quot;highlighter-rouge&quot;&gt;ObjectInputStream&lt;/code&gt; and &lt;code class=&quot;highlighter-rouge&quot;&gt;ObjectOutputStream&lt;/code&gt;. They use subinterfaces of the interface that data streams use, thus sharing primitive data I/O methods with data streams.&lt;/p&gt;
+
+&lt;p&gt;If you want your object to be serializable, it has to implement the marker interface Serializable. Since Serializable is a marker interface, it has no methods to be overriden.&lt;/p&gt;
+
+&lt;p&gt;Serializable objects can only contain objects which are also serializable. All object references must be serialized, so the entire network of interconnected objects may be properly put back together again and used.&lt;/p&gt;
+
+&lt;p&gt;So if it has another object that is not serializable in its properties, such as a Scanner, then you can mark it as transient or static so it won’t get serialized.&lt;/p&gt;
+
+&lt;p&gt;Writes/Reads values of the object’s nonstatic an nontransient attributes.&lt;/p&gt;
+
+&lt;h2 id=&quot;exceptions&quot;&gt;Exceptions&lt;/h2&gt;
+
+&lt;p&gt;// NOTE: When you work with I/O operations, you’ll need to catch or
+// throw three types of checked exceptions:
+// IOException - thrown when an error occurs in I/O processing
+// EOFException - thrown when code attempts to read beyond end of file
+// FileNotFoundException - thrown when code attempts to open nonexistent file&lt;/p&gt;
+
+</description>
+          <pubDate>2017-11-12T00:00:00-05:00</pubDate>
+          <link>http://briennakh.github.io/notes/File-I-O-basics</link>
+          <guid isPermaLink="true">http://briennakh.github.io/notes/File-I-O-basics</guid>
+        </item>
+      
+    
+      
+        <item>
           <title>Why you need to cast after an instanceof</title>
           <description>&lt;p&gt;See this code block:&lt;/p&gt;
 
