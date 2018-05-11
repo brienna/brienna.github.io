@@ -3,37 +3,98 @@
   <channel>
     <title>briennakh</title>
     <description></description>
-    <link>http://briennakh.github.io</link>
+    <link>http://localhost:4000</link>
+    
+      
+        <item>
+          <title>Copying files between Amazon S3 buckets using EC2 and Python</title>
+          <description>&lt;p&gt;&lt;strong&gt;GOAL:&lt;/strong&gt; Copy files from the Amazon S3 bucket &lt;code class=&quot;highlighter-rouge&quot;&gt;arxiv&lt;/code&gt; to your Amazon S3 bucket. I will use my bucket &lt;code class=&quot;highlighter-rouge&quot;&gt;briennakh-arxiv&lt;/code&gt;.&lt;/p&gt;
+
+&lt;p&gt;AWS offers a SDK, called Boto 3, that makes it easy to integrate your Python script with AWS services including Amazon S3 and Amazon EC2. Download this SDK onto your machine with &lt;code class=&quot;highlighter-rouge&quot;&gt;$ pip install boto3&lt;/code&gt;. Full documentation can be found &lt;a href=&quot;https://aws.amazon.com/sdk-for-python/&quot;&gt;here&lt;/a&gt;.&lt;/p&gt;
+
+&lt;p&gt;Before you can begin using Boto 3 in your Python script, you must do the following:&lt;/p&gt;
+&lt;ol&gt;
+  &lt;li&gt;Have an AWS account. If you don’t have one, you can sign up &lt;a href=&quot;http://aws.amazon.com/&quot;&gt;here&lt;/a&gt;. Create an IAM user for yourself.&lt;/li&gt;
+  &lt;li&gt;Install the command line client for AWS: &lt;code class=&quot;highlighter-rouge&quot;&gt;$ brew install awscli&lt;/code&gt;.&lt;/li&gt;
+  &lt;li&gt;Set up authentication credentials: &lt;code class=&quot;highlighter-rouge&quot;&gt;$ aws configure&lt;/code&gt;. The AWS CLI will prompt you for four pieces of information:
+    &lt;ul&gt;
+      &lt;li&gt;The first two pieces are your account credentials, the AWS Access Key ID and AWS Secret Access Key. To get them, visit the &lt;a href=&quot;https://console.aws.amazon.com/iam/home?#home&quot;&gt;IAM console&lt;/a&gt;, select your IAM user name, navigate to the “Security credentials” tab and press the “Create access key” button. Copy and paste the generated values.&lt;/li&gt;
+      &lt;li&gt;The third piece is your default region name. Set this to &lt;code class=&quot;highlighter-rouge&quot;&gt;us-east-1&lt;/code&gt;, the region the arxiv bucket is in.&lt;/li&gt;
+      &lt;li&gt;Skip the last prompt, “Default output format,” by pressing Enter.&lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;h2 id=&quot;putting-together-the-python-script&quot;&gt;Putting together the Python script&lt;/h2&gt;
+
+&lt;p&gt;I will post individual parts then post the entire script at the end.&lt;/p&gt;
+
+&lt;h3 id=&quot;launch-an-ec2-instance&quot;&gt;Launch an EC2 instance&lt;/h3&gt;
+
+&lt;p&gt;Find the id of the Amazon Machine Image (AMI) you’d like to use. I chose the latest Amazon Linux AMI, which is free tier eligible. I found its id, ami-97785bed, by going to this &lt;a href=&quot;https://aws.amazon.com/amazon-linux-ami/&quot;&gt;link&lt;/a&gt; and choosing the id for the HVM (SSD) EBS-Backed 64-bit and US East N. Virginia.&lt;/p&gt;
+
+&lt;p&gt;Launch the EC2 instance on this AMI.&lt;/p&gt;
+
+&lt;p&gt;```
+import boto3&lt;/p&gt;
+
+&lt;p&gt;https://console.aws.amazon.com/ec2/v2/home?region=us-east-1#LaunchInstanceWizard:&lt;/p&gt;
+
+&lt;p&gt;Find images you want to use.&lt;/p&gt;
+
+&lt;p&gt;You can find a list of Amazon Machine Images &lt;a href=&quot;https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/AMIs.html&quot;&gt;here&lt;/a&gt;. I chose a Free Tier one that .&lt;/p&gt;
+
+&lt;p&gt;Before you can begin using this SDK in your Python script, you need to do a few things with the &lt;a href=&quot;https://console.aws.amazon.com/&quot;&gt;AWS Management Console&lt;/a&gt;:&lt;/p&gt;
+&lt;ol&gt;
+  &lt;li&gt;&lt;strong&gt;Launch your EC2 instance.&lt;/strong&gt; Go to Services &amp;gt; EC2 &amp;gt; Instances &amp;gt; Launch Instance. Make sure your region is set to “N. Virginia,” which is the region the &lt;code class=&quot;highlighter-rouge&quot;&gt;arxiv&lt;/code&gt; bucket is in. You can easily set your region using the navigation bar. More information about regions can be found &lt;a href=&quot;https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/using-regions-availability-zones.html&quot;&gt;here&lt;/a&gt;.
+ a. I chose&lt;/li&gt;
+  &lt;li&gt;&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;Pieces of information you will need:&lt;/p&gt;
+&lt;ul&gt;
+  &lt;li&gt;Your EC2 instance. Find this by logging into your Amazon AWS Console and navigating to Services &amp;gt; EC2 &amp;gt; Instances&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;arXiv provides a &lt;a href=&quot;https://arxiv.org/help/bulk_data_s3&quot;&gt;page&lt;/a&gt; describing their bulk data available from Amazon S3, which is worth reading.&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;multithreading/multiprocessing 
+https://boto3.readthedocs.io/en/latest/guide/resources.html#identifiers-attributes-intro&lt;/li&gt;
+&lt;/ul&gt;
+</description>
+          <pubDate>2018-02-28T00:00:00-05:00</pubDate>
+          <link>http://localhost:4000/notes/amazon-s3-download</link>
+          <guid isPermaLink="true">http://localhost:4000/notes/amazon-s3-download</guid>
+        </item>
+      
     
       
         <item>
           <title>Addressing a unchecked cast warning</title>
           <description>&lt;p&gt;I wrote some code, so that I could, among other things, read a serialized &lt;code class=&quot;highlighter-rouge&quot;&gt;ArrayList&amp;lt;Vehicle&amp;gt;&lt;/code&gt; from an &lt;code class=&quot;highlighter-rouge&quot;&gt;ObjectInputStream&lt;/code&gt;, &lt;code class=&quot;highlighter-rouge&quot;&gt;in&lt;/code&gt;, into &lt;code class=&quot;highlighter-rouge&quot;&gt;orders&lt;/code&gt;:&lt;/p&gt;
 
-&lt;div class=&quot;language-java highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;n&quot;&gt;orders&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;ArrayList&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Vehicle&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;gt;)&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;in&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;readObject&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;();&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
+&lt;div class=&quot;language-java highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;n&quot;&gt;orders&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;ArrayList&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Vehicle&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;gt;)&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;in&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;readObject&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;();&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
 &lt;p&gt;But the Java compiler gives an unchecked cast warning:&lt;/p&gt;
 
-&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;MacBook:Homework Brienna$ javac Orders.java -Xlint:unchecked
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;MacBook:Homework Brienna$ javac Orders.java -Xlint:unchecked
 Orders.java:152: warning: [unchecked] unchecked cast
                     orders = (ArrayList&amp;lt;Vehicle&amp;gt;) in.readObject();
                                                                 ^
   required: ArrayList&amp;lt;Vehicle&amp;gt;
   found:    Object
 1 warning
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
 &lt;p&gt;The problem is that a cast is a runtime check, but a generic type (the &lt;code class=&quot;highlighter-rouge&quot;&gt;&amp;lt;Vehicle&amp;gt;&lt;/code&gt; part of &lt;code class=&quot;highlighter-rouge&quot;&gt;ArrayList&amp;lt;Vehicle&amp;gt;&lt;/code&gt;) gets erased during compilation and is not available at runtime for the cast. In fact, at runtime there is no difference between an &lt;code class=&quot;highlighter-rouge&quot;&gt;ArrayList&amp;lt;Vehicle&amp;gt;&lt;/code&gt; and an &lt;code class=&quot;highlighter-rouge&quot;&gt;ArrayList&amp;lt;AnythingElse&amp;gt;&lt;/code&gt;. Because of this type erasure, I can’t check that I actually have an &lt;code class=&quot;highlighter-rouge&quot;&gt;ArrayList&amp;lt;Vehicle&amp;gt;&lt;/code&gt; when I am casting. So I need to do the check myself by looping through the ArrayList and casting each element individually:&lt;/p&gt;
 
-&lt;div class=&quot;language-java highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;n&quot;&gt;ArrayList&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;lt;?&amp;gt;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;ar&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;ArrayList&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;lt;?&amp;gt;)&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;in&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;readObject&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;();&lt;/span&gt;
+&lt;div class=&quot;language-java highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;n&quot;&gt;ArrayList&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;lt;?&amp;gt;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;ar&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;ArrayList&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;lt;?&amp;gt;)&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;in&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;readObject&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;();&lt;/span&gt;
 &lt;span class=&quot;k&quot;&gt;for&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Object&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;x&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;ar&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
     &lt;span class=&quot;n&quot;&gt;orders&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;add&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;((&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Vehicle&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;x&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;);&lt;/span&gt;
 &lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
 &lt;p&gt;Note: Since I have control over the objects which were originally serialized, I could avoid the loop by using an array instead of an ArrayList. Array types are always a safe cast (if they don’t have a generic type themselves).&lt;/p&gt;
 
@@ -42,8 +103,8 @@ Orders.java:152: warning: [unchecked] unchecked cast
 &lt;p&gt;The full code for this assignment can be found &lt;a href=&quot;https://github.com/briennakh/ISTE200/tree/master/Day%206/Homework&quot;&gt;here&lt;/a&gt;.&lt;/p&gt;
 </description>
           <pubDate>2017-12-28T00:00:00-05:00</pubDate>
-          <link>http://briennakh.github.io/notes/how-to-address-unchecked-cast-warning</link>
-          <guid isPermaLink="true">http://briennakh.github.io/notes/how-to-address-unchecked-cast-warning</guid>
+          <link>http://localhost:4000/notes/how-to-address-unchecked-cast-warning</link>
+          <guid isPermaLink="true">http://localhost:4000/notes/how-to-address-unchecked-cast-warning</guid>
         </item>
       
     
@@ -79,9 +140,8 @@ Orders.java:152: warning: [unchecked] unchecked cast
 &lt;p&gt;File class:
 An object represents a file. This class does not do any I/O itself.&lt;/p&gt;
 
-&lt;div class=&quot;language-java highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;n&quot;&gt;File&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;theFile&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;new&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;File&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;hello world.txt&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;);&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
+&lt;div class=&quot;language-java highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;n&quot;&gt;File&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;theFile&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;new&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;File&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;hello world.txt&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;);&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
 &lt;p&gt;Most common methods I’ve been using in the File class:&lt;/p&gt;
 
@@ -189,8 +249,8 @@ An object represents a file. This class does not do any I/O itself.&lt;/p&gt;
 
 </description>
           <pubDate>2017-11-12T00:00:00-05:00</pubDate>
-          <link>http://briennakh.github.io/notes/File-I-O-basics</link>
-          <guid isPermaLink="true">http://briennakh.github.io/notes/File-I-O-basics</guid>
+          <link>http://localhost:4000/notes/File-I-O-basics</link>
+          <guid isPermaLink="true">http://localhost:4000/notes/File-I-O-basics</guid>
         </item>
       
     
@@ -199,23 +259,21 @@ An object represents a file. This class does not do any I/O itself.&lt;/p&gt;
           <title>Why you need to cast after an instanceof</title>
           <description>&lt;p&gt;See this code block:&lt;/p&gt;
 
-&lt;div class=&quot;language-java highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;k&quot;&gt;for&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Object&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;person&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;people&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
+&lt;div class=&quot;language-java highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;k&quot;&gt;for&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Object&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;person&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;people&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
     &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;person&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;instance&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Child&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
         &lt;span class=&quot;n&quot;&gt;Child&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;kid&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Child&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;person&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;;&lt;/span&gt;
     &lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
 &lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
 &lt;p&gt;If we already checked that Person is an instance of a Child, why are we still casting it as a Child?&lt;/p&gt;
 
 &lt;p&gt;Person could be an instance of a class higher up in the inheritance chain. We don’t necessarily know the inheritance chain. It could be something like this:&lt;/p&gt;
 
-&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;Grandparent
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;Grandparent
     |_____ Parent
             |______ Child
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
 &lt;p&gt;where Grandparent is the base class, parent extends grandparent. Child extends parent.&lt;/p&gt;
 
@@ -225,13 +283,12 @@ An object represents a file. This class does not do any I/O itself.&lt;/p&gt;
 
 &lt;p&gt;Take this:&lt;/p&gt;
 
-&lt;div class=&quot;language-java highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;k&quot;&gt;for&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Object&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;person&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;people&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
+&lt;div class=&quot;language-java highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;k&quot;&gt;for&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Object&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;person&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;people&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
     &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;person&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;instance&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Child&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
         &lt;span class=&quot;n&quot;&gt;Child&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;student&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;person&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;;&lt;/span&gt;
     &lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
 &lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
 &lt;p&gt;If Person were a Child and we didn’t cast it to ensure it was a Child, then nothing happens. But if Person is NOT a Child but a Grandparent, for example, then the above is actually assigning a Grandparent object to a Child object.&lt;/p&gt;
 
@@ -241,8 +298,8 @@ An object represents a file. This class does not do any I/O itself.&lt;/p&gt;
 Casting actually puts it in the box.&lt;/p&gt;
 </description>
           <pubDate>2017-10-05T00:00:00-04:00</pubDate>
-          <link>http://briennakh.github.io/notes/cast-after-instanceof</link>
-          <guid isPermaLink="true">http://briennakh.github.io/notes/cast-after-instanceof</guid>
+          <link>http://localhost:4000/notes/cast-after-instanceof</link>
+          <guid isPermaLink="true">http://localhost:4000/notes/cast-after-instanceof</guid>
         </item>
       
     
@@ -263,7 +320,7 @@ Casting actually puts it in the box.&lt;/p&gt;
 
 &lt;p&gt;For example, the setters &lt;code class=&quot;highlighter-rouge&quot;&gt;setEngine&lt;/code&gt; and &lt;code class=&quot;highlighter-rouge&quot;&gt;setLoad&lt;/code&gt;:&lt;/p&gt;
 
-&lt;div class=&quot;language-java highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;kd&quot;&gt;public&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;void&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;setEngine&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;int&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;index&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
+&lt;div class=&quot;language-java highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;kd&quot;&gt;public&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;void&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;setEngine&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;int&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;index&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
     &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;index&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;amp;&amp;amp;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;index&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;ENGINES&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;length&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
       &lt;span class=&quot;n&quot;&gt;engine&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;ENGINES&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;index&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;];&lt;/span&gt;  
     &lt;span class=&quot;o&quot;&gt;}&lt;/span&gt; 
@@ -274,18 +331,16 @@ Casting actually puts it in the box.&lt;/p&gt;
       &lt;span class=&quot;n&quot;&gt;load&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;LOADS&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;index&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;];&lt;/span&gt;
     &lt;span class=&quot;o&quot;&gt;}&lt;/span&gt; 
 &lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
 &lt;p&gt;Since the setters are similar, I wanted to see if I could write a generic setter:&lt;/p&gt;
 
-&lt;div class=&quot;language-java highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;kd&quot;&gt;public&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;boolean&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;setVariable&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;int&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;index&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;String&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;[]&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;list&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;String&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;var&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
+&lt;div class=&quot;language-java highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;kd&quot;&gt;public&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;boolean&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;setVariable&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;int&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;index&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;String&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;[]&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;list&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;String&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;var&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
   &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;index&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;amp;&amp;amp;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;index&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;list&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;length&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
     &lt;span class=&quot;n&quot;&gt;var&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;list&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;index&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;];&lt;/span&gt;  
   &lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
 &lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
 &lt;p&gt;It didn’t work. &lt;code class=&quot;highlighter-rouge&quot;&gt;var&lt;/code&gt; did change, but the instance variables didn’t.&lt;/p&gt;
 
@@ -296,8 +351,8 @@ Casting actually puts it in the box.&lt;/p&gt;
 &lt;p&gt;Helpful resource: https://www.journaldev.com/3884/java-is-pass-by-value-and-not-pass-by-reference&lt;/p&gt;
 </description>
           <pubDate>2017-10-04T00:00:00-04:00</pubDate>
-          <link>http://briennakh.github.io/notes/java-passes-by-value</link>
-          <guid isPermaLink="true">http://briennakh.github.io/notes/java-passes-by-value</guid>
+          <link>http://localhost:4000/notes/java-passes-by-value</link>
+          <guid isPermaLink="true">http://localhost:4000/notes/java-passes-by-value</guid>
         </item>
       
     
@@ -347,8 +402,8 @@ Casting actually puts it in the box.&lt;/p&gt;
 
 </description>
           <pubDate>2017-09-30T00:00:00-04:00</pubDate>
-          <link>http://briennakh.github.io/notes/installing-and-using-mysql</link>
-          <guid isPermaLink="true">http://briennakh.github.io/notes/installing-and-using-mysql</guid>
+          <link>http://localhost:4000/notes/installing-and-using-mysql</link>
+          <guid isPermaLink="true">http://localhost:4000/notes/installing-and-using-mysql</guid>
         </item>
       
     
@@ -419,8 +474,8 @@ Casting actually puts it in the box.&lt;/p&gt;
 
 </description>
           <pubDate>2017-09-26T00:00:00-04:00</pubDate>
-          <link>http://briennakh.github.io/notes/present-and-future-state-of-cloud-computing</link>
-          <guid isPermaLink="true">http://briennakh.github.io/notes/present-and-future-state-of-cloud-computing</guid>
+          <link>http://localhost:4000/notes/present-and-future-state-of-cloud-computing</link>
+          <guid isPermaLink="true">http://localhost:4000/notes/present-and-future-state-of-cloud-computing</guid>
         </item>
       
     
@@ -431,7 +486,7 @@ Casting actually puts it in the box.&lt;/p&gt;
 
 &lt;p&gt;The final version of my code:&lt;/p&gt;
 
-&lt;div class=&quot;language-java highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;java.util.Scanner&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;;&lt;/span&gt;
+&lt;div class=&quot;language-java highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;java.util.Scanner&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;;&lt;/span&gt;
 
 &lt;span class=&quot;kd&quot;&gt;public&lt;/span&gt; &lt;span class=&quot;kd&quot;&gt;class&lt;/span&gt; &lt;span class=&quot;nc&quot;&gt;OrderNumbers&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
 
@@ -495,14 +550,13 @@ Casting actually puts it in the box.&lt;/p&gt;
     &lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
 
 &lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
 &lt;p&gt;It took me a while to code the part that checks whether the user input is valid, and if it isn’t, to continue prompting the user for a valid input. The final version of my code makes use of the best approach I could come up with without using an array.&lt;/p&gt;
 
 &lt;p&gt;This was my first approach:&lt;/p&gt;
 
-&lt;div class=&quot;language-java highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;c1&quot;&gt;// Prompt user to input numbers while checking validity&lt;/span&gt;
+&lt;div class=&quot;language-java highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;c1&quot;&gt;// Prompt user to input numbers while checking validity&lt;/span&gt;
 &lt;span class=&quot;k&quot;&gt;while&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kc&quot;&gt;true&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
     &lt;span class=&quot;n&quot;&gt;System&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;out&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;print&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;Enter number: &quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;);&lt;/span&gt;
     &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;(!&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;scan&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;hasNextInt&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;())&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
@@ -533,14 +587,13 @@ Casting actually puts it in the box.&lt;/p&gt;
         &lt;span class=&quot;k&quot;&gt;break&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;;&lt;/span&gt;
     &lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
 &lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
 &lt;p&gt;A bit redundant, eh? To mop up this wet code, I added the variable &lt;code class=&quot;highlighter-rouge&quot;&gt;pointer&lt;/code&gt; to keep track of user input for variable assignment, allowing me to reuse the same block of code to validate all user inputs.&lt;/p&gt;
 </description>
           <pubDate>2017-09-15T00:00:00-04:00</pubDate>
-          <link>http://briennakh.github.io/notes/exercise-in-writing-dry-code</link>
-          <guid isPermaLink="true">http://briennakh.github.io/notes/exercise-in-writing-dry-code</guid>
+          <link>http://localhost:4000/notes/exercise-in-writing-dry-code</link>
+          <guid isPermaLink="true">http://localhost:4000/notes/exercise-in-writing-dry-code</guid>
         </item>
       
     
@@ -566,11 +619,12 @@ to the appropriate objects.&lt;/p&gt;
 &lt;p&gt;https://stackoverflow.com/questions/45338333/why-is-my-download-progress-bar-firing-the-same-event-multiple-times/45339354#45339354&lt;/p&gt;
 
 &lt;p&gt;Blog post about separating swing worker into logic, and letting a background task that needs to publish happen in another class
-Note: Also note that in most of my more complex Swing GUI’s, I often do my file downloading in a different (model) object and create my SwingWorker in a different object still (control) from the GUI object (the view). It may seem more complicated to do it this way, but it’s a lot easier to debug, maintain and enhance my program when I do it this way, especially when I heavily use interfaces to allow me to test all program components in isolation.
-- File downloading is Model
-- SwingWorker is in Control (to delegate publish to another class, all your getData(…) method needs to do is to periodically update a class property and notify listeners. Makes it easy to decouple the logic from the presentation.&lt;/p&gt;
-
+Note: Also note that in most of my more complex Swing GUI’s, I often do my file downloading in a different (model) object and create my SwingWorker in a different object still (control) from the GUI object (the view). It may seem more complicated to do it this way, but it’s a lot easier to debug, maintain and enhance my program when I do it this way, especially when I heavily use interfaces to allow me to test all program components in isolation.&lt;/p&gt;
 &lt;ul&gt;
+  &lt;li&gt;File downloading is Model&lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;SwingWorker is in Control (to delegate publish to another class, all your getData(…) method needs to do is to periodically update a class property and notify listeners. Makes it easy to decouple the logic from the presentation.&lt;/p&gt;
+  &lt;/li&gt;
   &lt;li&gt;https://stackoverflow.com/questions/2908306/how-to-delegate-swingworkers-publish-to-other-methods&lt;/li&gt;
 &lt;/ul&gt;
 
@@ -579,8 +633,8 @@ Note: Also note that in most of my more complex Swing GUI’s, I often do my fil
 &lt;p&gt;Figure out why so many calls to System print ln… in my progress bar?&lt;/p&gt;
 </description>
           <pubDate>2017-07-25T00:00:00-04:00</pubDate>
-          <link>http://briennakh.github.io/notes/swingworker-mvc-organization</link>
-          <guid isPermaLink="true">http://briennakh.github.io/notes/swingworker-mvc-organization</guid>
+          <link>http://localhost:4000/notes/swingworker-mvc-organization</link>
+          <guid isPermaLink="true">http://localhost:4000/notes/swingworker-mvc-organization</guid>
         </item>
       
     
@@ -609,7 +663,7 @@ Note: Also note that in most of my more complex Swing GUI’s, I often do my fil
 
 &lt;p&gt;To do this job, invoke &lt;code class=&quot;highlighter-rouge&quot;&gt;SwingUtilities.invokeLater&lt;/code&gt;. Executing on the event dispatch thread, this method asynchronously invokes the Runnable object you pass to it, taking into consideration that the thread may be busy at the time.&lt;/p&gt;
 
-&lt;div class=&quot;language-java highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;kn&quot;&gt;package&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;counter&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;;&lt;/span&gt;
+&lt;div class=&quot;language-java highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;kn&quot;&gt;package&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;counter&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;;&lt;/span&gt;
 
 &lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;javax.swing.SwingUtilities&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;;&lt;/span&gt;
 
@@ -623,8 +677,7 @@ Note: Also note that in most of my more complex Swing GUI’s, I often do my fil
         &lt;span class=&quot;o&quot;&gt;});&lt;/span&gt;
     &lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
 &lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
 &lt;h3 id=&quot;dont-block-the-gui-by-putting-long-running-tasks-on-the-event-dispatch-thread&quot;&gt;Don’t block the GUI by putting long-running tasks on the event dispatch thread&lt;/h3&gt;
 
@@ -634,7 +687,7 @@ Note: Also note that in most of my more complex Swing GUI’s, I often do my fil
 
 &lt;p&gt;The following code builds the counter GUI, but the “Start counter” button action listener executes a long-running task &lt;em&gt;on&lt;/em&gt; the event dispatch thread.&lt;/p&gt;
 
-&lt;div class=&quot;language-java highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;kn&quot;&gt;package&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;counter&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;;&lt;/span&gt;
+&lt;div class=&quot;language-java highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;kn&quot;&gt;package&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;counter&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;;&lt;/span&gt;
 
 &lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;java.awt.BorderLayout&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;;&lt;/span&gt;
 &lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;javax.swing.JPanel&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;;&lt;/span&gt;
@@ -703,8 +756,7 @@ Note: Also note that in most of my more complex Swing GUI’s, I often do my fil
         &lt;span class=&quot;n&quot;&gt;frame&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;pack&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;();&lt;/span&gt;
     &lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
 &lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
 &lt;p&gt;&lt;img src=&quot;/assets/07-13-17/frozen_gui.gif&quot; alt=&quot;frozen gui&quot; class=&quot;center-image&quot; /&gt;&lt;/p&gt;
 
@@ -718,7 +770,7 @@ Note: Also note that in most of my more complex Swing GUI’s, I often do my fil
 
 &lt;p&gt;In the following code edit, the “Start counter” button action listener creates and executes an instance of &lt;code class=&quot;highlighter-rouge&quot;&gt;SwingWorker&lt;/code&gt; from the event dispatch thread. When the user presses the button, the worker object launches a worker thread and runs the task on it, leaving the event dispatch thread unblocked.&lt;/p&gt;
 
-&lt;div class=&quot;language-java highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;kd&quot;&gt;private&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;void&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;createButton&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;()&lt;/span&gt;  &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
+&lt;div class=&quot;language-java highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;kd&quot;&gt;private&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;void&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;createButton&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;()&lt;/span&gt;  &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
     &lt;span class=&quot;n&quot;&gt;button&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;new&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;JButton&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;Start counter&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;);&lt;/span&gt;
     &lt;span class=&quot;n&quot;&gt;button&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;addActionListener&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;new&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;ActionListener&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;()&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
         &lt;span class=&quot;cm&quot;&gt;/* 
@@ -748,8 +800,7 @@ Note: Also note that in most of my more complex Swing GUI’s, I often do my fil
         &lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
     &lt;span class=&quot;o&quot;&gt;});&lt;/span&gt;
 &lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
 &lt;p&gt;&lt;img src=&quot;/assets/07-13-17/unfrozen_gui.gif&quot; alt=&quot;unfrozen gui&quot; class=&quot;center-image&quot; /&gt;&lt;/p&gt;
 
@@ -764,8 +815,8 @@ Note: Also note that in most of my more complex Swing GUI’s, I often do my fil
 &lt;p&gt;If you need to determine whether your code is running on the event dispatch thread, invoke &lt;code class=&quot;highlighter-rouge&quot;&gt;javax.swing.SwingUtilities.isEventDispatchThread&lt;/code&gt;.&lt;/p&gt;
 </description>
           <pubDate>2017-07-13T00:00:00-04:00</pubDate>
-          <link>http://briennakh.github.io/notes/swingworker</link>
-          <guid isPermaLink="true">http://briennakh.github.io/notes/swingworker</guid>
+          <link>http://localhost:4000/notes/swingworker</link>
+          <guid isPermaLink="true">http://localhost:4000/notes/swingworker</guid>
         </item>
       
     
@@ -780,26 +831,24 @@ Note: Also note that in most of my more complex Swing GUI’s, I often do my fil
 
 &lt;p&gt;&lt;strong&gt;Code that measures execution time:&lt;/strong&gt;&lt;/p&gt;
 
-&lt;div class=&quot;language-java highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;kt&quot;&gt;long&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;startTime&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;System&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;nanoTime&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;();&lt;/span&gt;
+&lt;div class=&quot;language-java highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;kt&quot;&gt;long&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;startTime&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;System&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;nanoTime&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;();&lt;/span&gt;
 &lt;span class=&quot;n&quot;&gt;Thread&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;sleep&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;10000&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;);&lt;/span&gt;
 &lt;span class=&quot;kt&quot;&gt;long&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;executionTime&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;System&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;nanoTime&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;()&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;startTime&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;;&lt;/span&gt;
 &lt;span class=&quot;n&quot;&gt;System&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;out&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;println&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;executionTime&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;);&lt;/span&gt;  &lt;span class=&quot;c1&quot;&gt;// prints something like 10000472572&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
 &lt;p&gt;To convert the execution time to any format you want, a good library to use is &lt;code class=&quot;highlighter-rouge&quot;&gt;java.util.concurrent.TimeUnit&lt;/code&gt;. It isn’t a good idea to divide or multiply time to change units, because this is senselessly error-prone and harder to read. Always use a library.&lt;/p&gt;
 
 &lt;p&gt;&lt;strong&gt;Code that converts execution time to minutes and seconds:&lt;/strong&gt;&lt;/p&gt;
 
-&lt;div class=&quot;language-java highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;kt&quot;&gt;long&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;minutes&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;TimeUnit&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;NANOSECONDS&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;toMinutes&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;executionTime&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;);&lt;/span&gt;
+&lt;div class=&quot;language-java highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;kt&quot;&gt;long&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;minutes&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;TimeUnit&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;NANOSECONDS&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;toMinutes&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;executionTime&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;);&lt;/span&gt;
 &lt;span class=&quot;kt&quot;&gt;long&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;seconds&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;TimeUnit&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;NANOSECONDS&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;toSeconds&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;executionTime&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;TimeUnit&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;MINUTES&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;toSeconds&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;minutes&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;);&lt;/span&gt;
 &lt;span class=&quot;n&quot;&gt;System&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;out&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;println&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;String&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;format&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;%d min, %d sec&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;minutes&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;seconds&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;));&lt;/span&gt;  &lt;span class=&quot;c1&quot;&gt;// prints 0 min, 10 sec&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
 &lt;p&gt;&lt;strong&gt;The complete code:&lt;/strong&gt;&lt;/p&gt;
 
-&lt;div class=&quot;language-java highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;java.util.concurrent.TimeUnit&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;;&lt;/span&gt;
+&lt;div class=&quot;language-java highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;java.util.concurrent.TimeUnit&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;;&lt;/span&gt;
 
 &lt;span class=&quot;kd&quot;&gt;public&lt;/span&gt; &lt;span class=&quot;kd&quot;&gt;class&lt;/span&gt; &lt;span class=&quot;nc&quot;&gt;ExecutionTimeMeasurer&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
     &lt;span class=&quot;kd&quot;&gt;public&lt;/span&gt; &lt;span class=&quot;kd&quot;&gt;static&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;void&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;main&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;String&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;[]&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;args&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;kd&quot;&gt;throws&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;InterruptedException&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
@@ -814,13 +863,12 @@ Note: Also note that in most of my more complex Swing GUI’s, I often do my fil
         &lt;span class=&quot;n&quot;&gt;System&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;out&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;println&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;String&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;format&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;%d min, %d sec&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;minutes&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;seconds&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;));&lt;/span&gt;
     &lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
 &lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
 </description>
           <pubDate>2017-07-02T00:00:00-04:00</pubDate>
-          <link>http://briennakh.github.io/notes/calculating-elapsed-time</link>
-          <guid isPermaLink="true">http://briennakh.github.io/notes/calculating-elapsed-time</guid>
+          <link>http://localhost:4000/notes/calculating-elapsed-time</link>
+          <guid isPermaLink="true">http://localhost:4000/notes/calculating-elapsed-time</guid>
         </item>
       
     
@@ -863,19 +911,18 @@ Note: Also note that in most of my more complex Swing GUI’s, I often do my fil
 
 &lt;p&gt;The package structure:&lt;/p&gt;
 
-&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;mvc_tutorial
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;mvc_tutorial
     |_ MVCCalculator.java   
     |_ CalculatorModel.java 
     |_ CalculatorView.java
     |_ CalculatorController.java  
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
 &lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;CalculatorModel.java&lt;/code&gt; contains the model, &lt;code class=&quot;highlighter-rouge&quot;&gt;CalculatorView.java&lt;/code&gt; the view, and &lt;code class=&quot;highlighter-rouge&quot;&gt;CalculatorController.java&lt;/code&gt; the controller. &lt;code class=&quot;highlighter-rouge&quot;&gt;MVCCalculator.java&lt;/code&gt; launches the program.&lt;/p&gt;
 
 &lt;p&gt;MVCCalculator.java:&lt;/p&gt;
 
-&lt;div class=&quot;language-java highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;kn&quot;&gt;package&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;mvc_tutorial&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;;&lt;/span&gt;
+&lt;div class=&quot;language-java highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;kn&quot;&gt;package&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;mvc_tutorial&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;;&lt;/span&gt;
 
 &lt;span class=&quot;cm&quot;&gt;/**
  * 
@@ -894,12 +941,11 @@ Note: Also note that in most of my more complex Swing GUI’s, I often do my fil
         &lt;span class=&quot;n&quot;&gt;theView&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;setVisible&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kc&quot;&gt;true&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;);&lt;/span&gt;
     &lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
 &lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
 &lt;p&gt;CalculatorModel.java:&lt;/p&gt;
 
-&lt;div class=&quot;language-java highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;kn&quot;&gt;package&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;mvc_tutorial&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;;&lt;/span&gt;
+&lt;div class=&quot;language-java highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;kn&quot;&gt;package&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;mvc_tutorial&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;;&lt;/span&gt;
 
 &lt;span class=&quot;cm&quot;&gt;/**
  * 
@@ -920,12 +966,11 @@ Note: Also note that in most of my more complex Swing GUI’s, I often do my fil
         &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;calculationValue&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;;&lt;/span&gt;
     &lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
 &lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
 &lt;p&gt;CalculatorView.java:&lt;/p&gt;
 
-&lt;div class=&quot;language-java highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;kn&quot;&gt;package&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;mvc_tutorial&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;;&lt;/span&gt;
+&lt;div class=&quot;language-java highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;kn&quot;&gt;package&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;mvc_tutorial&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;;&lt;/span&gt;
 
 &lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;java.awt.event.ActionListener&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;;&lt;/span&gt;
 &lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;javax.swing.*&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;;&lt;/span&gt;
@@ -985,12 +1030,11 @@ Note: Also note that in most of my more complex Swing GUI’s, I often do my fil
         &lt;span class=&quot;n&quot;&gt;JOptionPane&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;showMessageDialog&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;this&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;errorMessage&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;);&lt;/span&gt;
     &lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
 &lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
 &lt;p&gt;CalculatorController.java:&lt;/p&gt;
 
-&lt;div class=&quot;language-java highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;kn&quot;&gt;package&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;mvc_tutorial&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;;&lt;/span&gt;
+&lt;div class=&quot;language-java highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;kn&quot;&gt;package&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;mvc_tutorial&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;;&lt;/span&gt;
 
 &lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;java.awt.event.ActionEvent&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;;&lt;/span&gt;
 &lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;java.awt.event.ActionListener&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;;&lt;/span&gt;
@@ -1032,14 +1076,13 @@ Note: Also note that in most of my more complex Swing GUI’s, I often do my fil
         &lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
     &lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
 &lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
 &lt;p&gt;When the user clicks the “Calculate” button, the View notifies the Controller of this user action via the &lt;code class=&quot;highlighter-rouge&quot;&gt;CalculateListener&lt;/code&gt; listener. The Controller defined this listener and passed it to the View via the &lt;code class=&quot;highlighter-rouge&quot;&gt;addCalculateListener&lt;/code&gt; method, which attached the listener to the button. In the listener’s &lt;code class=&quot;highlighter-rouge&quot;&gt;actionPerformed&lt;/code&gt; method, the Controller retrieves the number that the user entered, instructs the Model to add them, and retrieves the sum, telling the View to display it.&lt;/p&gt;
 </description>
           <pubDate>2017-06-28T00:00:00-04:00</pubDate>
-          <link>http://briennakh.github.io/notes/learning-mvc</link>
-          <guid isPermaLink="true">http://briennakh.github.io/notes/learning-mvc</guid>
+          <link>http://localhost:4000/notes/learning-mvc</link>
+          <guid isPermaLink="true">http://localhost:4000/notes/learning-mvc</guid>
         </item>
       
     
@@ -1151,8 +1194,8 @@ Each entity always corresponds to a relation.&lt;/p&gt;
 
 </description>
           <pubDate>2017-06-04T00:00:00-04:00</pubDate>
-          <link>http://briennakh.github.io/notes/ISTE-208-study-guide-part-2</link>
-          <guid isPermaLink="true">http://briennakh.github.io/notes/ISTE-208-study-guide-part-2</guid>
+          <link>http://localhost:4000/notes/ISTE-208-study-guide-part-2</link>
+          <guid isPermaLink="true">http://localhost:4000/notes/ISTE-208-study-guide-part-2</guid>
         </item>
       
     
@@ -1163,18 +1206,17 @@ Each entity always corresponds to a relation.&lt;/p&gt;
 
 &lt;p&gt;I named my package &lt;code class=&quot;highlighter-rouge&quot;&gt;alignmentparser&lt;/code&gt; and set its directory structure as&lt;/p&gt;
 
-&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;[root]
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;[root]
     alignmentparser
         |_____ Subject.java
         |_____ TestRunner.java
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
-&lt;p&gt;At the top of each Java file, I added the package statement &lt;code class=&quot;highlighter-rouge&quot;&gt;package alignmentparser&lt;/code&gt;, the package name corresponding to the directory structure relative to the file.&lt;/p&gt;
+&lt;p&gt;At the top of each Java file, I added the package statement &lt;code class=&quot;highlighter-rouge&quot;&gt;&lt;span class=&quot;k&quot;&gt;package&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;alignmentparser&lt;/span&gt;&lt;/code&gt;, the package name corresponding to the directory structure relative to the file.&lt;/p&gt;
 
 &lt;p&gt;My first attempt at compiling &lt;code class=&quot;highlighter-rouge&quot;&gt;TestRunner&lt;/code&gt;, which includes a dependency on &lt;code class=&quot;highlighter-rouge&quot;&gt;Subject&lt;/code&gt;, resulted in errors indicating that the compiler was not finding &lt;code class=&quot;highlighter-rouge&quot;&gt;Subject&lt;/code&gt;.&lt;/p&gt;
 
-&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;Briennas-MacBook-2:alignmentparser Brienna$ javac TestRunner.java
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;Briennas-MacBook-2:alignmentparser Brienna$ javac TestRunner.java
 TestRunner.java:9: error: cannot find symbol
   private Subject subj = new Subject(&quot;NM_080704&quot;, 1710, 2495);
           ^
@@ -1186,14 +1228,12 @@ TestRunner.java:9: error: cannot find symbol
   symbol:   class Subject
   location: class TestRunner
 2 errors
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
 &lt;p&gt;After digging through online resources and enlisting the help of a friend (who asked me why in the world I wasn’t using an IDE like any sane person would), I chanced upon something that worked — going up one level in my working directory and compiling from there instead.&lt;/p&gt;
 
-&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;Briennas-MacBook-2:GitHub repositories Brienna$ javac alignmentparser/TestRunner.java
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;Briennas-MacBook-2:GitHub repositories Brienna$ javac alignmentparser/TestRunner.java
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
 &lt;p&gt;The reason why I messed up my first attempt at compiling &lt;code class=&quot;highlighter-rouge&quot;&gt;TestRunner&lt;/code&gt; was because of something called the class path. The class path is the location where the compiler begins its search. It defaults to the current working directory. So when I compiled &lt;code class=&quot;highlighter-rouge&quot;&gt;TestRunner&lt;/code&gt; while in the &lt;code class=&quot;highlighter-rouge&quot;&gt;alignmentparser&lt;/code&gt; directory, the class path defaulted to &lt;code class=&quot;highlighter-rouge&quot;&gt;[root]/alignmentparser&lt;/code&gt;. Then when the compiler encountered the reference to &lt;code class=&quot;highlighter-rouge&quot;&gt;Subject&lt;/code&gt;, it began its search for that class by appending &lt;code class=&quot;highlighter-rouge&quot;&gt;Subject&lt;/code&gt;’s package declaration to the default class path, making the class path now &lt;code class=&quot;highlighter-rouge&quot;&gt;[root]/alignmentparser/alignmentparser&lt;/code&gt;. This path does not exist, hence the compilation errors.&lt;/p&gt;
 
@@ -1218,8 +1258,8 @@ TestRunner.java:9: error: cannot find symbol
 
 </description>
           <pubDate>2017-02-09T00:00:00-05:00</pubDate>
-          <link>http://briennakh.github.io/notes/Compiling-and-running</link>
-          <guid isPermaLink="true">http://briennakh.github.io/notes/Compiling-and-running</guid>
+          <link>http://localhost:4000/notes/Compiling-and-running</link>
+          <guid isPermaLink="true">http://localhost:4000/notes/Compiling-and-running</guid>
         </item>
       
     
@@ -1230,7 +1270,7 @@ TestRunner.java:9: error: cannot find symbol
 
 &lt;p&gt;But console logging is not perfect, which I realized the other day when helping &lt;a href=&quot;https://github.com/Gregb1609&quot;&gt;Gregb1609&lt;/a&gt; on FreeCodeCamp’s Gitter chat. He was working on an intermediate algorithm scripting problem called &lt;a href=&quot;https://www.freecodecamp.com/challenges/sum-all-primes&quot;&gt;Sum All Primes&lt;/a&gt;, where you’re supposed to sum all the prime numbers up to and including the provided number. His solution worked with lower numbers, like 10, but lagged badly with higher numbers, like 977.&lt;/p&gt;
 
-&lt;div class=&quot;language-javascript highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;kd&quot;&gt;function&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;sumPrimes&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;num&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+&lt;div class=&quot;language-javascript highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;kd&quot;&gt;function&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;sumPrimes&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;num&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
   &lt;span class=&quot;kd&quot;&gt;var&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;multiple&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;kc&quot;&gt;false&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
   &lt;span class=&quot;kd&quot;&gt;var&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;sum&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
   &lt;span class=&quot;k&quot;&gt;for&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kd&quot;&gt;var&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;i&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;num&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;i&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;i&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;--&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;){&lt;/span&gt;
@@ -1254,8 +1294,7 @@ TestRunner.java:9: error: cannot find symbol
 
 &lt;span class=&quot;nx&quot;&gt;sumPrimes&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;10&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;   &lt;span class=&quot;c1&quot;&gt;// works fine&lt;/span&gt;
 &lt;span class=&quot;nx&quot;&gt;sumPrimes&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;977&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;  &lt;span class=&quot;c1&quot;&gt;// lags badly&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
 &lt;p&gt;When I took a look at his code, it looked fine. No obvious bugs. So using a sort of elimination method, I gradually reformatted my own solution to the problem, which worked, to match his. In doing so, I realized that the only true difference between his and my code was that he console logged while I didn’t.&lt;/p&gt;
 
@@ -1264,8 +1303,8 @@ TestRunner.java:9: error: cannot find symbol
 &lt;p&gt;Gregb1609’s case was extreme, but it showed me that console logging really slows down a program’s execution. To prevent giving up performance for nothing, I’ll have to remember to comment out any console log statements before I push code to production.&lt;/p&gt;
 </description>
           <pubDate>2016-09-28T00:00:00-04:00</pubDate>
-          <link>http://briennakh.github.io/notes/beware-of-slow-console-logs</link>
-          <guid isPermaLink="true">http://briennakh.github.io/notes/beware-of-slow-console-logs</guid>
+          <link>http://localhost:4000/notes/beware-of-slow-console-logs</link>
+          <guid isPermaLink="true">http://localhost:4000/notes/beware-of-slow-console-logs</guid>
         </item>
       
     
