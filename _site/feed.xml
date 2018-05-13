@@ -7,6 +7,174 @@
     
       
         <item>
+          <title>Machine Learning Specialization: Course 1, Week 2</title>
+          <description>&lt;blockquote&gt;
+  &lt;p&gt;This week you will build your first intelligent application that makes predictions from data. We will explore this idea within the context of our first case study, predicting house prices, where you will create models that predict a continuous value (price) from input features (square footage, number of bedrooms and bathrooms,…). This is just one of the many places where regression can be applied. Other applications range from predicting health outcomes in medicine, stock prices in finance, and power usage in high-performance computing, to analyzing which regulators are important for gene expression. You will also examine how to analyze the performance of your predictive model and implement regression in practice using an iPython notebook.&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;h2 id=&quot;overview-of-linear-regression&quot;&gt;Overview of linear regression:&lt;/h2&gt;
+
+&lt;p&gt;Linear rgression is a popular statistical tool with the following uses:&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;Prediction
+    &lt;ul&gt;
+      &lt;li&gt;We have a set of features and we want to model how our observations that are associated with these features change as we change the values of the features. For example, a house has some set of features like the size of the house, number of bedrooms, number of bathrooms, and so on. The observation that we have is the value of the house.&lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/li&gt;
+  &lt;li&gt;Classification
+    &lt;ul&gt;
+      &lt;li&gt;If we have an email and we want to classify it as spam or not, we can think of that email as having features related to its text that are indicative of whether that email is spam or not.&lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/li&gt;
+  &lt;li&gt;Analyze importance of features&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&quot;linear-regression-modeling&quot;&gt;Linear regression modeling&lt;/h2&gt;
+
+&lt;p&gt;Problem: We want to sell our house, but we don’t know how much to list it for.&lt;/p&gt;
+
+&lt;h3 id=&quot;simple-approaches-not-using-linear-regression&quot;&gt;Simple approaches (not using linear regression)&lt;/h3&gt;
+
+&lt;p&gt;To try to estimate the value of our house, we might look at other recent sales in the neighborhood and what those houses look like.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/05-11-18/image1.png&quot; alt=&quot;Recent house sales&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;em&gt;An x-value is also called an independent variable, &lt;strong&gt;feature&lt;/strong&gt;, covariate, or predictor. A y-value is also called a dependent variable, &lt;strong&gt;observation&lt;/strong&gt;, or response.&lt;/em&gt;&lt;/p&gt;
+
+&lt;p&gt;How do we use these observations to estimate our house value?&lt;/p&gt;
+
+&lt;p&gt;We might look at how big our house is, and then look for other sales of houses of that size.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/05-11-18/image2.png&quot; alt=&quot;Predict our house by similar houses&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;However, most likely that no house sold recently had exactly the same square footage as our house. So we can’t use this approach.&lt;/p&gt;
+
+&lt;p&gt;A slightly more flexible approach is to look at a range of square footage around our actual square footage.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/05-11-18/image3.png&quot; alt=&quot;Predict our house by similar houses&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;But even with this approach, we only have two house sales that we’re going to base our estimage off of. And we’re throwing out all these other observations as if they had nothing to do with the value of our house. That isn’t reasonable. There is still information in these other observations. We should leverage all the information that we can to come up with good predictions.&lt;/p&gt;
+
+&lt;h3 id=&quot;linear-regression-approach&quot;&gt;Linear regression approach&lt;/h3&gt;
+
+&lt;p&gt;Let’s try linear regression to model the relationship between the square footage of the house and the house sales price. The simplest linear regression model is to just fit a line through the data.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/05-11-18/image4.png&quot; alt=&quot;Linear regression model&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;This line is defined by f&lt;sub&gt;w&lt;/sub&gt;(x) = w&lt;sub&gt;0&lt;/sub&gt; + w&lt;sub&gt;1&lt;/sub&gt;x with an intercept w&lt;sub&gt;0&lt;/sub&gt; and a slope w&lt;sub&gt;1&lt;/sub&gt;.&lt;/p&gt;
+
+&lt;p&gt;The w in f&lt;sub&gt;w&lt;/sub&gt;(x) indicates that this function is specified by parameters. For this function, our parameters are the intercept and the slope, which means the function is parameterized by the set of w&lt;sub&gt;0&lt;/sub&gt; and w&lt;sub&gt;1&lt;/sub&gt;, or w = (w&lt;sub&gt;0&lt;/sub&gt; and w&lt;sub&gt;1&lt;/sub&gt;).&lt;/p&gt;
+
+&lt;p&gt;The slope, or w&lt;sub&gt;1&lt;/sub&gt;, is also called the regression coefficient, or the weight on the feature x. As we vary x, the square footage of the house, the regression coefficient determines how much of an impact this change has on changes in the observed house sales price.&lt;/p&gt;
+
+&lt;p&gt;We could draw slightly different lines, each given by a different set of parameters w. Which line is the right line or a good line? Which w do we want to choose for our model?&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/05-11-18/image5.png&quot; alt=&quot;Linear regression model&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;We choose by defining a cost for a given line. One very common cost associated with a specific fit to the data is something called the residual sum of squares (RSS).&lt;/p&gt;
+
+&lt;p&gt;With RSS, we get the difference between our prediction and our actual observation. To do this, we first look at how far each observation is from the fitted line, or from what the model would predict.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/05-11-18/image6.png&quot; alt=&quot;Linear regression model&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Then we look at the square of these distances and sum over them.&lt;/p&gt;
+
+&lt;p&gt;RSS(w&lt;sub&gt;0&lt;/sub&gt;, w&lt;sub&gt;1&lt;/sub&gt;) =  &lt;br /&gt;
+      ($&lt;sub&gt;house1&lt;/sub&gt; - [w&lt;sub&gt;0&lt;/sub&gt; + w&lt;sub&gt;1&lt;/sub&gt;sq.ft.&lt;sub&gt;house1&lt;/sub&gt;])&lt;sup&gt;2&lt;/sup&gt;  &lt;br /&gt;
+    + ($&lt;sub&gt;house2&lt;/sub&gt; - [w&lt;sub&gt;0&lt;/sub&gt; + w&lt;sub&gt;1&lt;/sub&gt;sq.ft.&lt;sub&gt;house2&lt;/sub&gt;])&lt;sup&gt;2&lt;/sup&gt;  &lt;br /&gt;
+    + ($&lt;sub&gt;house3&lt;/sub&gt; - [w&lt;sub&gt;0&lt;/sub&gt; + w&lt;sub&gt;1&lt;/sub&gt;sq.ft.&lt;sub&gt;house3&lt;/sub&gt;])&lt;sup&gt;2&lt;/sup&gt;  &lt;br /&gt;
+    + … [include all houses]&lt;/p&gt;
+
+&lt;p&gt;After we calculate the cost of all possible w’s, or lines, we choose the one that minimizes the RSS. The resulting w that we choose is denoted as ŵ = (ŵ&lt;sub&gt;0&lt;/sub&gt;, ŵ&lt;sub&gt;1&lt;/sub&gt;). You can say the ŵ as “w hat.”&lt;/p&gt;
+
+&lt;p&gt;The best guess of our house price is what f&lt;sub&gt;ŵ&lt;/sub&gt;(x) = ŵ&lt;sub&gt;0&lt;/sub&gt; + ŵ&lt;sub&gt;1&lt;/sub&gt;x predicts.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/05-11-18/image7.png&quot; alt=&quot;Linear regression model&quot; /&gt;&lt;/p&gt;
+
+&lt;h3 id=&quot;adding-higher-order-effects&quot;&gt;Adding higher order effects&lt;/h3&gt;
+
+&lt;p&gt;Perhaps a linear fit is not the best fit. Let’s try a quadratic fit. (Even though we’re talking about a quadratic fit to the data, this is actually still called linear regression, because we think of x&lt;sup&gt;2&lt;/sup&gt; just as another feature, in addition to x.)&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/05-11-18/image8.png&quot; alt=&quot;Linear regression model&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;This line is defined by f&lt;sub&gt;w&lt;/sub&gt;(x) = w&lt;sub&gt;0&lt;/sub&gt; + w&lt;sub&gt;1&lt;/sub&gt;x + w&lt;sub&gt;2&lt;/sub&gt;x&lt;sup&gt;2&lt;/sup&gt;. Here we have three parameters.&lt;/p&gt;
+
+&lt;p&gt;Now we need to figure out which is the best quadratic fit to this data. We can do this by minimizing our RSS, again.&lt;/p&gt;
+
+&lt;p&gt;A 13th-order polynomial looks like it would be an even better fit.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/05-11-18/image9.png&quot; alt=&quot;Linear regression model&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Our RSS here are basically zero. But can we believe this fit? It shows that our house is worth very little. Yes, we talked about RSS as being this cost of the fit. And we have really minimized our RSS here, but this function just looks crazy. We need a way to evaluate our fit.&lt;/p&gt;
+
+</description>
+          <pubDate>2018-05-11T00:00:00-04:00</pubDate>
+          <link>http://localhost:4000/notes/machine-learning-course1-week2</link>
+          <guid isPermaLink="true">http://localhost:4000/notes/machine-learning-course1-week2</guid>
+        </item>
+      
+    
+      
+        <item>
+          <title>Machine Learning Specialization: Course 1, Week 1</title>
+          <description>&lt;h1 id=&quot;week-1-welcome&quot;&gt;Week 1, Welcome&lt;/h1&gt;
+
+&lt;blockquote&gt;
+  &lt;p&gt;“Machine learning is everywhere, but is often operating behind the scenes. This introduction to the specialization provides you with insights into the power of machine learning, and the multitude of intelligent applications you personally will be able to develop and deploy upon completion. We also discuss who we are, how we got here, and our view of the future of intelligent applications.”&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;This specialization does things a little differently than other courses in machine learning. Rather than supplying you with a laundry list of algorithms and methods, this specialization focuses on helping you to figure out what task you’re trying to solve, what algorithms and methods make sense in the context of the task, and how to measure their performance. By focusing on use cases and treating algorithms as black boxes, you will be able to better grasp the key concepts that allow you to build and measure a strong intelligent application, rather than a simple application that may be disconnected from reality.&lt;/p&gt;
+
+&lt;p&gt;In the first course in this specialization, you will build intelligent applications. In the second, third, and fourth courses, you will formulate, implement, and evaluate machine learning methods.&lt;/p&gt;
+
+&lt;p&gt;Required math background: basic calculus (derivatives) and basic linear algebra (vectors, matrices, and matrix multiplication).&lt;/p&gt;
+
+&lt;p&gt;This specialization uses the Jupyter Notebook (formerly IPython Notebook), which is Python plus wiki pages. To open a notebook via Terminal, navigate to the directory containing the notebook, then execute &lt;code class=&quot;highlighter-rouge&quot;&gt;jupyter notebook&lt;/code&gt;.&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;Other useful Jupyter operations:&lt;/strong&gt;&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;Change cell type to code, while inside cell: esc + Y&lt;/li&gt;
+  &lt;li&gt;Change cell type to markdown, while inside cell: esc + M&lt;/li&gt;
+  &lt;li&gt;Execute a cell, while inside cell: shift + enter&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;&lt;strong&gt;Short Python refresher:&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;In addition to the conventional way of creating a function with the &lt;code class=&quot;highlighter-rouge&quot;&gt;def&lt;/code&gt; command, you can also create an anonymous function with &lt;code class=&quot;highlighter-rouge&quot;&gt;lambda&lt;/code&gt;. Borrowed from Lisp, the &lt;code class=&quot;highlighter-rouge&quot;&gt;lambda&lt;/code&gt; function has the following syntax &lt;code class=&quot;highlighter-rouge&quot;&gt;lamba arg1, arg2 : expression&lt;/code&gt;. Arguments can be numerous, but there can be only one expression that is evaluated and returned.&lt;/p&gt;
+
+&lt;div class=&quot;language-python highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;c&quot;&gt;# Conventional function&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;f&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;x&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;):&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;x&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;x&lt;/span&gt;
+
+&lt;span class=&quot;n&quot;&gt;f&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;3&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;  &lt;span class=&quot;c&quot;&gt;# 9&lt;/span&gt;
+
+&lt;span class=&quot;c&quot;&gt;# Lambda function&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;g&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;lambda&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;x&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;x&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;x&lt;/span&gt;
+
+&lt;span class=&quot;n&quot;&gt;g&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;3&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;  &lt;span class=&quot;c&quot;&gt;# 9&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;As you can see, the conventional function &lt;code class=&quot;highlighter-rouge&quot;&gt;f()&lt;/code&gt; and the &lt;code class=&quot;highlighter-rouge&quot;&gt;lambda&lt;/code&gt; function &lt;code class=&quot;highlighter-rouge&quot;&gt;g()&lt;/code&gt; do the exact same thing, taking input &lt;code class=&quot;highlighter-rouge&quot;&gt;x&lt;/code&gt;, squaring it, and returning the result. &lt;code class=&quot;highlighter-rouge&quot;&gt;lambda&lt;/code&gt; functions are a matter of style. It is never required to use them; you could use a conventional function anywhere you would use a &lt;code class=&quot;highlighter-rouge&quot;&gt;lambda&lt;/code&gt; function. However, &lt;code class=&quot;highlighter-rouge&quot;&gt;lambda&lt;/code&gt; functions can be useful if you want to encapsulate specific, non-reusable code without cluttering your code with many short functions.&lt;/p&gt;
+
+&lt;h3 id=&quot;resources&quot;&gt;Resources&lt;/h3&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;&lt;a href=&quot;https://www.coursera.org/specializations/machine-learning&quot;&gt;Machine Learning Specialization&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;https://github.com/briennakh/machine-learning&quot;&gt;My GitHub repo for the specialization&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;https://github.com/briennakh/machine-learning/tree/master/1.%20Machine%20learning%20foundations%20-%20A%20case%20study%20approach/Week%201%2C%20Welcome&quot;&gt;My GitHub repo subdirectory for Course 1, Week 1&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+</description>
+          <pubDate>2018-05-10T00:00:00-04:00</pubDate>
+          <link>http://localhost:4000/notes/machine-learning-course1-week1</link>
+          <guid isPermaLink="true">http://localhost:4000/notes/machine-learning-course1-week1</guid>
+        </item>
+      
+    
+      
+        <item>
           <title>Copying files between Amazon S3 buckets using EC2 and Python</title>
           <description>&lt;p&gt;&lt;strong&gt;GOAL:&lt;/strong&gt; Copy files from the Amazon S3 bucket &lt;code class=&quot;highlighter-rouge&quot;&gt;arxiv&lt;/code&gt; to your Amazon S3 bucket. I will use my bucket &lt;code class=&quot;highlighter-rouge&quot;&gt;briennakh-arxiv&lt;/code&gt;.&lt;/p&gt;
 
