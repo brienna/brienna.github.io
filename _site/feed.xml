@@ -7,6 +7,205 @@
     
       
         <item>
+          <title>How to bulk access arXiv full-texts</title>
+          <description>&lt;p&gt;Since its inception in 1991, arXiv, the main database for scientific preprints, has received almost &lt;a href=&quot;https://arxiv.org/help/stats/2017_by_area/index&quot;&gt;1.3 million submissions&lt;/a&gt;. All of this data can be useful in analysis, so we may want to be able to access the full-texts in bulk. This post goes over how we can do this using Python 3 and the command line.&lt;/p&gt;
+
+&lt;h2 id=&quot;amazon-s3-info&quot;&gt;Amazon S3 info&lt;/h2&gt;
+
+&lt;p&gt;Although the data is sitting right there on the server, it is [not recommended to crawl arXiv directly]](https://arxiv.org/help/robots) due to limited server capacity. However, arXiv has acknowledged the demand for bulk access by &lt;a href=&quot;https://arxiv.org/help/bulk_data_s3&quot;&gt;making all full-texts available on Amazon S3&lt;/a&gt;, with monthly updates.&lt;/p&gt;
+
+&lt;p&gt;arXiv stores their source files in the &lt;code class=&quot;highlighter-rouge&quot;&gt;arxiv&lt;/code&gt; bucket. The requester has to pay. The data is in big tar files ordered by date (the last modification time of that file). This is kind of inconvenient, because we will need to process the entire arXiv corpus even if we are only interested in a specific category.&lt;/p&gt;
+
+&lt;p&gt;Below we will go over the steps to download the full-texts, targeting the &lt;code class=&quot;highlighter-rouge&quot;&gt;astro-ph&lt;/code&gt; category.&lt;/p&gt;
+
+&lt;h3 id=&quot;1-set-up-an-aws-account&quot;&gt;1. Set up an AWS account.&lt;/h3&gt;
+
+&lt;p&gt;To be able to download anything from Amazon S3, you need an Amazon Web Services (AWS) account. Sign up &lt;a href=&quot;https://portal.aws.amazon.com/billing/signup&quot;&gt;here&lt;/a&gt;. You’ll have to register a credit card.&lt;/p&gt;
+
+&lt;h3 id=&quot;2-create-your-configuration-file&quot;&gt;2. Create your configuration file.&lt;/h3&gt;
+
+&lt;p&gt;Create a file named &lt;code class=&quot;highlighter-rouge&quot;&gt;config.ini&lt;/code&gt; and add your AWS configs:&lt;/p&gt;
+
+&lt;div class=&quot;language-python highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;DEFAULT&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;ACCESS_KEY&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;access&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;key&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;value&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;SECRET_KEY&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;secret&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;key&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;value&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;To get your key values, follow the directions &lt;a href=&quot;https://www.cloudberrylab.com/blog/how-to-find-your-aws-access-key-id-and-secret-access-key-and-register-with-cloudberry-s3-explorer/&quot;&gt;here&lt;/a&gt; for root access keys.&lt;/p&gt;
+
+&lt;p&gt;Do not make this file public.&lt;/p&gt;
+
+&lt;h3 id=&quot;3-create-s3-resource--set-configs&quot;&gt;3. Create S3 resource &amp;amp; set configs.&lt;/h3&gt;
+
+&lt;p&gt;Create a Python file that you’ll run from the command line. In it, initialize a S3 resource, which is an object-oriented interface to the service, and configure it to use your root access.&lt;/p&gt;
+
+&lt;div class=&quot;language-python highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;boto3&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;configparser&lt;/span&gt;
+
+&lt;span class=&quot;n&quot;&gt;s3resource&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;bp&quot;&gt;None&lt;/span&gt;
+
+&lt;span class=&quot;k&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;setup&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;():&lt;/span&gt;
+    &lt;span class=&quot;s&quot;&gt;&quot;&quot;&quot;Creates S3 resource &amp;amp; sets configs to enable download.&quot;&quot;&quot;&lt;/span&gt;
+
+    &lt;span class=&quot;k&quot;&gt;print&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'Connecting to Amazon S3...'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+
+    &lt;span class=&quot;c&quot;&gt;# Securely import configs from private config file&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;configs&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;configparser&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;SafeConfigParser&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;configs&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;read&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'config.ini'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+
+    &lt;span class=&quot;c&quot;&gt;# Create S3 resource &amp;amp; set configs&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;global&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;s3resource&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;s3resource&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;boto3&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;resource&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;
+        &lt;span class=&quot;s&quot;&gt;'s3'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;  &lt;span class=&quot;c&quot;&gt;# the AWS resource we want to use&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;aws_access_key_id&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;configs&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'DEFAULT'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;][&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'ACCESS_KEY'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;],&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;aws_secret_access_key&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;configs&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'DEFAULT'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;][&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'SECRET_KEY'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;],&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;region_name&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'us-east-1'&lt;/span&gt;  &lt;span class=&quot;c&quot;&gt;# same region arxiv bucket is in&lt;/span&gt;
+    &lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+
+&lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;__name__&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;==&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;'__main__'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;
+    &lt;span class=&quot;s&quot;&gt;&quot;&quot;&quot;Runs if script is called on command line&quot;&quot;&quot;&lt;/span&gt;
+
+    &lt;span class=&quot;c&quot;&gt;# Create S3 resource &amp;amp; set configs&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;setup&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;h3 id=&quot;4-check-arxiv-bucket-metadata&quot;&gt;4. Check &lt;code class=&quot;highlighter-rouge&quot;&gt;arxiv&lt;/code&gt; bucket metadata.&lt;/h3&gt;
+
+&lt;p&gt;arXiv maintains useful information about the data in their bucket in a file called &lt;code class=&quot;highlighter-rouge&quot;&gt;src/arXiv_src_manifest.xml&lt;/code&gt;. Download this file to better understand what we’re working with.&lt;/p&gt;
+
+&lt;div class=&quot;language-python highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;boto3&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;configparser&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;os&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;botocore&lt;/span&gt;
+
+&lt;span class=&quot;k&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;download_file&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;key&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;):&lt;/span&gt;
+    &lt;span class=&quot;s&quot;&gt;&quot;&quot;&quot;
+    Downloads given filename from source bucket to destination directory.
+
+    Parameters
+    ----------
+    key : str
+        Name of file to download
+    &quot;&quot;&quot;&lt;/span&gt;
+
+    &lt;span class=&quot;c&quot;&gt;# Ensure src directory exists &lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;ow&quot;&gt;not&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;os&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;path&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;isdir&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'src'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;):&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;os&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;makedirs&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'src'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+
+    &lt;span class=&quot;c&quot;&gt;# Download file&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;print&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'&lt;/span&gt;&lt;span class=&quot;se&quot;&gt;\n&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;Downloading s3://arxiv/{} to {}...'&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;format&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;key&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;key&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;))&lt;/span&gt;
+
+    &lt;span class=&quot;k&quot;&gt;try&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;s3resource&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;meta&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;client&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;download_file&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;
+            &lt;span class=&quot;n&quot;&gt;Bucket&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'arxiv'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; 
+            &lt;span class=&quot;n&quot;&gt;Key&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;key&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;  &lt;span class=&quot;c&quot;&gt;# name of file to download from&lt;/span&gt;
+            &lt;span class=&quot;n&quot;&gt;Filename&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;key&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;  &lt;span class=&quot;c&quot;&gt;# path to file to download to&lt;/span&gt;
+            &lt;span class=&quot;n&quot;&gt;ExtraArgs&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'RequestPayer'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'requester'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;})&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;except&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;botocore&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;exceptions&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;ClientError&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;as&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;e&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;
+        &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;e&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;response&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'Error'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;][&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'Code'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;==&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;404&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;
+            &lt;span class=&quot;k&quot;&gt;print&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'ERROR: '&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;key&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot; does not exist in arxiv bucket&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+
+&lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;__name__&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;==&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;'__main__'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;
+    &lt;span class=&quot;s&quot;&gt;&quot;&quot;&quot;Runs if script is called on command line&quot;&quot;&quot;&lt;/span&gt;
+
+    &lt;span class=&quot;c&quot;&gt;# Download manifest file to current directory&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;download_file&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'src/arXiv_src_manifest.xml'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;&lt;em&gt;Note: The code will only show new or changed sections relevant to the current step, but the Python file contains code from all steps up to this one. The full file will be shown at the end.&lt;/em&gt;&lt;/p&gt;
+
+&lt;p&gt;Explore the bucket metadata in the manifest file.&lt;/p&gt;
+
+&lt;div class=&quot;language-python highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;kn&quot;&gt;from&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;bs4&lt;/span&gt; &lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;BeautifulSoup&lt;/span&gt;
+
+&lt;span class=&quot;k&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;explore_metadata&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;():&lt;/span&gt;
+    &lt;span class=&quot;s&quot;&gt;&quot;&quot;&quot;Explores arxiv bucket metadata.&quot;&quot;&quot;&lt;/span&gt;
+
+    &lt;span class=&quot;k&quot;&gt;print&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'&lt;/span&gt;&lt;span class=&quot;se&quot;&gt;\n&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;arxiv bucket metadata:'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+
+    &lt;span class=&quot;k&quot;&gt;with&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;open&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'src/arXiv_src_manifest.xml'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;'r'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;as&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;manifest&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;soup&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;BeautifulSoup&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;manifest&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;'xml'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+
+        &lt;span class=&quot;c&quot;&gt;# Print last time the manifest was edited&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;timestamp&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;soup&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;arXivSRC&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;find&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'timestamp'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;recursive&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;bp&quot;&gt;False&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;string&lt;/span&gt;
+        &lt;span class=&quot;k&quot;&gt;print&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'Manifest was last edited on '&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;timestamp&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+
+        &lt;span class=&quot;c&quot;&gt;# Print number of files in bucket&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;numOfFiles&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;len&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;soup&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;find_all&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'file'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;))&lt;/span&gt;
+        &lt;span class=&quot;k&quot;&gt;print&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'arxiv bucket contains '&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;str&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;numOfFiles&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;' tars'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+
+        &lt;span class=&quot;c&quot;&gt;# Print total size&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;total_size&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;
+        &lt;span class=&quot;k&quot;&gt;for&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;size&lt;/span&gt; &lt;span class=&quot;ow&quot;&gt;in&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;soup&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;find_all&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'size'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;):&lt;/span&gt;
+            &lt;span class=&quot;n&quot;&gt;total_size&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;total_size&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;int&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;size&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;string&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+        &lt;span class=&quot;k&quot;&gt;print&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'Total size: '&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;str&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;total_size&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;/&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1000000000&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;' GB'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+
+    &lt;span class=&quot;k&quot;&gt;print&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;''&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+
+&lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;__name__&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;==&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;'__main__'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;
+    &lt;span class=&quot;s&quot;&gt;&quot;&quot;&quot;Runs if script is called on command line&quot;&quot;&quot;&lt;/span&gt;
+
+    &lt;span class=&quot;c&quot;&gt;# Explore bucket metadata &lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;explore_metadata&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;When we run this code, we’ll see when the manifest file was last updated, along with how many tar files the &lt;code class=&quot;highlighter-rouge&quot;&gt;arxiv&lt;/code&gt; bucket holds and the total size. When I ran this code (on June 10, 2018), the bucket contained 1,910 tars that were 924 GB in size.&lt;/p&gt;
+
+&lt;h3 id=&quot;5-download-astro-ph-source-files&quot;&gt;5. Download &lt;code class=&quot;highlighter-rouge&quot;&gt;astro-ph&lt;/code&gt; source files!&lt;/h3&gt;
+
+&lt;p&gt;Remember that each tar contains nested tar gzs, which in turn contain the source files from a specific category. While we must download each tar, we can extract these source files without the overhead of unzipping all of the tars and tar gzs. We will also screen the source files to only extract those labelled with the &lt;code class=&quot;highlighter-rouge&quot;&gt;astro-ph&lt;/code&gt; category.&lt;/p&gt;
+
+&lt;div class=&quot;language-python highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;json&lt;/span&gt;
+&lt;span class=&quot;kn&quot;&gt;from&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;datetime&lt;/span&gt; &lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;datetime&lt;/span&gt;
+
+&lt;span class=&quot;k&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;begin_download&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;():&lt;/span&gt;
+    &lt;span class=&quot;s&quot;&gt;&quot;&quot;&quot;Sets up download of tars from arxiv bucket.&quot;&quot;&quot;&lt;/span&gt;
+
+    &lt;span class=&quot;k&quot;&gt;print&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'Beginning tar download &amp;amp; extraction...'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+
+    &lt;span class=&quot;c&quot;&gt;# Create a reusable Paginator&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;paginator&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;s3resource&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;meta&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;client&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;get_paginator&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'list_objects_v2'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+
+    &lt;span class=&quot;c&quot;&gt;# Create a PageIterator from the Paginator&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;page_iterator&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;paginator&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;paginate&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;Bucket&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'arxiv'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;RequestPayer&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'requester'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;Prefix&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'src/'&lt;/span&gt;
+    &lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+
+    &lt;span class=&quot;c&quot;&gt;# Download and extract tars&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;numFiles&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;with&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;open&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'file_log.txt'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;'a'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;as&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;file_log&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;
+        &lt;span class=&quot;c&quot;&gt;# Iterate through each file in each page&lt;/span&gt;
+        &lt;span class=&quot;k&quot;&gt;for&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;page&lt;/span&gt; &lt;span class=&quot;ow&quot;&gt;in&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;page_iterator&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;
+            &lt;span class=&quot;n&quot;&gt;numFiles&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;numFiles&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;len&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;page&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'Contents'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;])&lt;/span&gt;
+            &lt;span class=&quot;k&quot;&gt;for&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;file&lt;/span&gt; &lt;span class=&quot;ow&quot;&gt;in&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;page&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'Contents'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]:&lt;/span&gt;
+                &lt;span class=&quot;n&quot;&gt;key&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;file&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'Key'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt;
+                &lt;span class=&quot;n&quot;&gt;timestamp&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;file&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'LastModified'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt;
+                &lt;span class=&quot;n&quot;&gt;file_log&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;write&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;key&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;'&lt;/span&gt;&lt;span class=&quot;se&quot;&gt;\t&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;str&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;timestamp&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;))&lt;/span&gt;
+                &lt;span class=&quot;c&quot;&gt;# If current file is a tar&lt;/span&gt;
+                &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;key&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;endswith&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'.tar'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;):&lt;/span&gt;
+                    &lt;span class=&quot;c&quot;&gt;# Check if it has already been downloaded&lt;/span&gt;
+                    &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;os&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;path&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;exists&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;key&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;):&lt;/span&gt;
+                        &lt;span class=&quot;k&quot;&gt;print&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;key&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;' already has been downloaded and extracted'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+                    &lt;span class=&quot;c&quot;&gt;# If it hasn't already been downloaded, download &lt;/span&gt;
+                    &lt;span class=&quot;k&quot;&gt;else&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;
+                        &lt;span class=&quot;n&quot;&gt;download_file&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;key&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+            
+    &lt;span class=&quot;k&quot;&gt;print&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'Processed '&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;str&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;numFiles&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;' tars'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;  &lt;span class=&quot;c&quot;&gt;# -1 &lt;/span&gt;
+
+&lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;__name__&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;==&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;'__main__'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;
+    &lt;span class=&quot;s&quot;&gt;&quot;&quot;&quot;Runs if script is called on command line&quot;&quot;&quot;&lt;/span&gt;
+
+    &lt;span class=&quot;c&quot;&gt;# Begin tar download &amp;amp; extraction &lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;begin_download&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+</description>
+          <pubDate>2018-06-08T00:00:00-04:00</pubDate>
+          <link>http://localhost:4000/notes/bulk-arxiv-download</link>
+          <guid isPermaLink="true">http://localhost:4000/notes/bulk-arxiv-download</guid>
+        </item>
+      
+    
+      
+        <item>
           <title>Machine Learning Specialization: Course 1, Week 2</title>
           <description>&lt;blockquote&gt;
   &lt;p&gt;This week you will build your first intelligent application that makes predictions from data. We will explore this idea within the context of our first case study, predicting house prices, where you will create models that predict a continuous value (price) from input features (square footage, number of bedrooms and bathrooms,…). This is just one of the many places where regression can be applied. Other applications range from predicting health outcomes in medicine, stock prices in finance, and power usage in high-performance computing, to analyzing which regulators are important for gene expression. You will also examine how to analyze the performance of your predictive model and implement regression in practice using an iPython notebook.&lt;/p&gt;
@@ -14,7 +213,7 @@
 
 &lt;h2 id=&quot;overview-of-linear-regression&quot;&gt;Overview of linear regression:&lt;/h2&gt;
 
-&lt;p&gt;Linear rgression is a popular statistical tool with the following uses:&lt;/p&gt;
+&lt;p&gt;Linear regression is a popular statistical tool with the following uses:&lt;/p&gt;
 
 &lt;ul&gt;
   &lt;li&gt;Prediction
@@ -102,11 +301,59 @@
 
 &lt;p&gt;Now we need to figure out which is the best quadratic fit to this data. We can do this by minimizing our RSS, again.&lt;/p&gt;
 
-&lt;p&gt;A 13th-order polynomial looks like it would be an even better fit.&lt;/p&gt;
+&lt;p&gt;A 13th-order polynomial looks like it would be an even better fit. Our RSS here are basically zero.&lt;/p&gt;
 
 &lt;p&gt;&lt;img src=&quot;/assets/05-11-18/image9.png&quot; alt=&quot;Linear regression model&quot; /&gt;&lt;/p&gt;
 
-&lt;p&gt;Our RSS here are basically zero. But can we believe this fit? It shows that our house is worth very little. Yes, we talked about RSS as being this cost of the fit. And we have really minimized our RSS here, but this function just looks crazy. We need a way to evaluate our fit.&lt;/p&gt;
+&lt;p&gt;But can we believe this fit? It shows that our house is worth very little. Yes, we talked about RSS as being this cost of the fit. And we have really minimized our RSS here, but this function just looks crazy. We need a way to evaluate our fit.&lt;/p&gt;
+
+&lt;h2 id=&quot;evaluating-regression-models&quot;&gt;Evaluating regression models&lt;/h2&gt;
+
+&lt;h3 id=&quot;evaluating-overfitting-via-trainingtest-split&quot;&gt;Evaluating overfitting via training/test split&lt;/h3&gt;
+
+&lt;p&gt;The problem with the 13th-order polynomial is overfitting, which minimizes RSS but leads to very bad predictions. We’ve really honed in to our actual observations, but we’re not generalizing well to new observations we might get. Overfitting can be a problem with any machine learning model or statistical model.&lt;/p&gt;
+
+&lt;p&gt;Even though it didn’t minimize our RSS as much as the 13th-order polynomial, the quadratic fit appears to be a better model.&lt;/p&gt;
+
+&lt;p&gt;How do we choose the right model order or complexity? The goal is to get good predictions. We can’t actually observe these predictions, but we can simulate predictions.&lt;/p&gt;
+
+&lt;p&gt;To simulate predictions, we begin by randomly splitting the data set into two sets, one for training and the other for testing. In the plot below, the training data set is represented by blue circles and the test data set by gray circles.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/05-11-18/image10.png&quot; alt=&quot;Linear regression model&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;We fit our model on only the training set, use this model to predict the data in the test set, and then compare the predictions with the actual observed values. Of course, this method only works well if we have enough data in both sets.&lt;/p&gt;
+
+&lt;p&gt;To evaluate the fit, we still use RSS, but we calculate the RSS on only houses in the training data set. The resulting number is called the training error.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/05-11-18/image11.png&quot; alt=&quot;Linear regression model&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Training error(w) = &lt;br /&gt;
+    ($&lt;sub&gt;train1&lt;/sub&gt; - f&lt;sub&gt;w&lt;/sub&gt;(sq.ft.&lt;sub&gt;train1&lt;/sub&gt;))&lt;sup&gt;2&lt;/sup&gt; &lt;br /&gt;
+    + ($&lt;sub&gt;train2&lt;/sub&gt; - f&lt;sub&gt;w&lt;/sub&gt;(sq.ft.&lt;sub&gt;train2&lt;/sub&gt;))&lt;sup&gt;2&lt;/sup&gt; &lt;br /&gt;
+    + ($&lt;sub&gt;train3&lt;/sub&gt; - f&lt;sub&gt;w&lt;/sub&gt;(sq.ft.&lt;sub&gt;train3&lt;/sub&gt;))&lt;sup&gt;2&lt;/sup&gt; &lt;br /&gt;
+    + … [include all houses in training data set]&lt;/p&gt;
+
+&lt;p&gt;After we minimize the training error over all fits and find our ŵ, we use this optimized fit to evaluate our test data set with RSS. The resulting number is called the test error.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/05-11-18/image12.png&quot; alt=&quot;Linear regression model&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Test error(ŵ) = &lt;br /&gt;
+    ($&lt;sub&gt;test1&lt;/sub&gt; - f&lt;sub&gt;ŵ&lt;/sub&gt;(sq.ft.&lt;sub&gt;test1&lt;/sub&gt;))&lt;sup&gt;2&lt;/sup&gt; &lt;br /&gt;
+    + ($&lt;sub&gt;test2&lt;/sub&gt; - f&lt;sub&gt;ŵ&lt;/sub&gt;(sq.ft.&lt;sub&gt;test2&lt;/sub&gt;))&lt;sup&gt;2&lt;/sup&gt; &lt;br /&gt;
+    + ($&lt;sub&gt;test3&lt;/sub&gt; - f&lt;sub&gt;ŵ&lt;/sub&gt;(sq.ft.&lt;sub&gt;test3&lt;/sub&gt;))&lt;sup&gt;2&lt;/sup&gt; &lt;br /&gt;
+    + … [include all houses in test data set]&lt;/p&gt;
+
+&lt;h3 id=&quot;trainingtest-curves&quot;&gt;Training/test curves&lt;/h3&gt;
+
+&lt;p&gt;How do the test error and training error vary as a function of the model complexity? The plot below shows what the curves tend to look like.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/05-11-18/image13.png&quot; alt=&quot;Training/test curve&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;As we increase the model order, our training error decreases until it hits a plateau. We saw this when our RSS continued to minimize more and more as we increased the model complexity.&lt;/p&gt;
+
+&lt;p&gt;Our test error also decreases until a certain point, then it begins to increase. We saw this increase happen with the 13th-order polynomial.&lt;/p&gt;
+
+&lt;p&gt;Training and test errors are important to keep in mind when we select the model order or complexity for making our predictions.&lt;/p&gt;
 
 </description>
           <pubDate>2018-05-11T00:00:00-04:00</pubDate>
@@ -170,70 +417,6 @@
           <pubDate>2018-05-10T00:00:00-04:00</pubDate>
           <link>http://localhost:4000/notes/machine-learning-course1-week1</link>
           <guid isPermaLink="true">http://localhost:4000/notes/machine-learning-course1-week1</guid>
-        </item>
-      
-    
-      
-        <item>
-          <title>Copying files between Amazon S3 buckets using EC2 and Python</title>
-          <description>&lt;p&gt;&lt;strong&gt;GOAL:&lt;/strong&gt; Copy files from the Amazon S3 bucket &lt;code class=&quot;highlighter-rouge&quot;&gt;arxiv&lt;/code&gt; to your Amazon S3 bucket. I will use my bucket &lt;code class=&quot;highlighter-rouge&quot;&gt;briennakh-arxiv&lt;/code&gt;.&lt;/p&gt;
-
-&lt;p&gt;AWS offers a SDK, called Boto 3, that makes it easy to integrate your Python script with AWS services including Amazon S3 and Amazon EC2. Download this SDK onto your machine with &lt;code class=&quot;highlighter-rouge&quot;&gt;$ pip install boto3&lt;/code&gt;. Full documentation can be found &lt;a href=&quot;https://aws.amazon.com/sdk-for-python/&quot;&gt;here&lt;/a&gt;.&lt;/p&gt;
-
-&lt;p&gt;Before you can begin using Boto 3 in your Python script, you must do the following:&lt;/p&gt;
-&lt;ol&gt;
-  &lt;li&gt;Have an AWS account. If you don’t have one, you can sign up &lt;a href=&quot;http://aws.amazon.com/&quot;&gt;here&lt;/a&gt;. Create an IAM user for yourself.&lt;/li&gt;
-  &lt;li&gt;Install the command line client for AWS: &lt;code class=&quot;highlighter-rouge&quot;&gt;$ brew install awscli&lt;/code&gt;.&lt;/li&gt;
-  &lt;li&gt;Set up authentication credentials: &lt;code class=&quot;highlighter-rouge&quot;&gt;$ aws configure&lt;/code&gt;. The AWS CLI will prompt you for four pieces of information:
-    &lt;ul&gt;
-      &lt;li&gt;The first two pieces are your account credentials, the AWS Access Key ID and AWS Secret Access Key. To get them, visit the &lt;a href=&quot;https://console.aws.amazon.com/iam/home?#home&quot;&gt;IAM console&lt;/a&gt;, select your IAM user name, navigate to the “Security credentials” tab and press the “Create access key” button. Copy and paste the generated values.&lt;/li&gt;
-      &lt;li&gt;The third piece is your default region name. Set this to &lt;code class=&quot;highlighter-rouge&quot;&gt;us-east-1&lt;/code&gt;, the region the arxiv bucket is in.&lt;/li&gt;
-      &lt;li&gt;Skip the last prompt, “Default output format,” by pressing Enter.&lt;/li&gt;
-    &lt;/ul&gt;
-  &lt;/li&gt;
-&lt;/ol&gt;
-
-&lt;h2 id=&quot;putting-together-the-python-script&quot;&gt;Putting together the Python script&lt;/h2&gt;
-
-&lt;p&gt;I will post individual parts then post the entire script at the end.&lt;/p&gt;
-
-&lt;h3 id=&quot;launch-an-ec2-instance&quot;&gt;Launch an EC2 instance&lt;/h3&gt;
-
-&lt;p&gt;Find the id of the Amazon Machine Image (AMI) you’d like to use. I chose the latest Amazon Linux AMI, which is free tier eligible. I found its id, ami-97785bed, by going to this &lt;a href=&quot;https://aws.amazon.com/amazon-linux-ami/&quot;&gt;link&lt;/a&gt; and choosing the id for the HVM (SSD) EBS-Backed 64-bit and US East N. Virginia.&lt;/p&gt;
-
-&lt;p&gt;Launch the EC2 instance on this AMI.&lt;/p&gt;
-
-&lt;p&gt;```
-import boto3&lt;/p&gt;
-
-&lt;p&gt;https://console.aws.amazon.com/ec2/v2/home?region=us-east-1#LaunchInstanceWizard:&lt;/p&gt;
-
-&lt;p&gt;Find images you want to use.&lt;/p&gt;
-
-&lt;p&gt;You can find a list of Amazon Machine Images &lt;a href=&quot;https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/AMIs.html&quot;&gt;here&lt;/a&gt;. I chose a Free Tier one that .&lt;/p&gt;
-
-&lt;p&gt;Before you can begin using this SDK in your Python script, you need to do a few things with the &lt;a href=&quot;https://console.aws.amazon.com/&quot;&gt;AWS Management Console&lt;/a&gt;:&lt;/p&gt;
-&lt;ol&gt;
-  &lt;li&gt;&lt;strong&gt;Launch your EC2 instance.&lt;/strong&gt; Go to Services &amp;gt; EC2 &amp;gt; Instances &amp;gt; Launch Instance. Make sure your region is set to “N. Virginia,” which is the region the &lt;code class=&quot;highlighter-rouge&quot;&gt;arxiv&lt;/code&gt; bucket is in. You can easily set your region using the navigation bar. More information about regions can be found &lt;a href=&quot;https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/using-regions-availability-zones.html&quot;&gt;here&lt;/a&gt;.
- a. I chose&lt;/li&gt;
-  &lt;li&gt;&lt;/li&gt;
-&lt;/ol&gt;
-
-&lt;p&gt;Pieces of information you will need:&lt;/p&gt;
-&lt;ul&gt;
-  &lt;li&gt;Your EC2 instance. Find this by logging into your Amazon AWS Console and navigating to Services &amp;gt; EC2 &amp;gt; Instances&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;arXiv provides a &lt;a href=&quot;https://arxiv.org/help/bulk_data_s3&quot;&gt;page&lt;/a&gt; describing their bulk data available from Amazon S3, which is worth reading.&lt;/p&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;multithreading/multiprocessing 
-https://boto3.readthedocs.io/en/latest/guide/resources.html#identifiers-attributes-intro&lt;/li&gt;
-&lt;/ul&gt;
-</description>
-          <pubDate>2018-02-28T00:00:00-05:00</pubDate>
-          <link>http://localhost:4000/notes/amazon-s3-download</link>
-          <guid isPermaLink="true">http://localhost:4000/notes/amazon-s3-download</guid>
         </item>
       
     
