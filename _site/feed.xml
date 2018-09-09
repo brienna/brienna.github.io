@@ -7,6 +7,38 @@
     
       
         <item>
+          <title>Resolving MacOS error &quot;The disk couldn't be ejected because one or more programs may be using it.&quot;</title>
+          <description>&lt;p&gt;When attempting to eject an external hard drive using MacOS, sometimes we get the error &lt;em&gt;The disk “[EXTERNAL_HARD_DRIVE_NAME]” couldn’t be ejected because one or more programs may be using it. To eject the disk immediately, click the Force Eject button.&lt;/em&gt;&lt;/p&gt;
+
+&lt;p&gt;Only we don’t always know &lt;em&gt;which&lt;/em&gt; programs are using the drive.&lt;/p&gt;
+
+&lt;p&gt;Open Terminal and enter &lt;code class=&quot;highlighter-rouge&quot;&gt;lsof | grep /Volumes/[EXTERNAL_HARD_DRIVE_NAME]&lt;/code&gt;.&lt;/p&gt;
+
+&lt;p&gt;We should get a list that looks like this:&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;photoanal 30331 Brienna  txt       REG               1,12      32768   194381 /Volumes/BRIENNAKH/Photos Library 3.photoslibrary/private/com.apple.photoanalysisd/GraphService/PhotosGraph/photosgraph.graphdb-shm
+photoanal 30331 Brienna    3u      REG               1,12    1892352   194380 /Volumes/BRIENNAKH/Photos Library 3.photoslibrary/private/com.apple.photoanalysisd/GraphService/PhotosGraph/photosgraph.graphdb
+photoanal 30331 Brienna    4u      REG               1,12          0   194382 /Volumes/BRIENNAKH/Photos Library 3.photoslibrary/private/com.apple.photoanalysisd/GraphService/PhotosGraph/photosgraph.graphdb-wal
+photoanal 30331 Brienna    5u      REG               1,12      32768   194381 /Volumes/BRIENNAKH/Photos Library 3.photoslibrary/private/com.apple.photoanalysisd/GraphService/PhotosGraph/photosgraph.graphdb-shm
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;These are the programs that are using the hard drive. We need to quit or kill them before we can eject the hard drive safely.&lt;/p&gt;
+
+&lt;p&gt;We can quit most programs normally, but some programs need to be killed via the Terminal. To do this, enter &lt;code class=&quot;highlighter-rouge&quot;&gt;kill [PROGRAM ID]&lt;/code&gt;. In the list above, the ID is the number after the program name. So &lt;code class=&quot;highlighter-rouge&quot;&gt;kill 30331&lt;/code&gt;.&lt;/p&gt;
+
+&lt;p&gt;But the photoanalysis daemon usually withstands death via Terminal. (I have a Photos library on the drive and photoanalysis is a process associated with Photos.) Looking at questions other people have posted online regarding this issue, it seems like the best solution is to force kill it via Activity Monitor.&lt;/p&gt;
+
+&lt;p&gt;An interesting read: &lt;a href=&quot;https://www.sciencealert.com/does-it-matter-if-you-pull-a-usb-without-waiting-for-it-to-safely-eject&quot;&gt;Does it really matter if you pull a USB out before it safely ejects?&lt;/a&gt; 
+I’m often guilty of just yanking the USB out, but I’m more hesistant to do so with my hard drive, since it’s the main backup for my MacBook.&lt;/p&gt;
+</description>
+          <pubDate>2018-09-09T00:00:00-04:00</pubDate>
+          <link>http://localhost:4000/notes/ejecting-hard-drive</link>
+          <guid isPermaLink="true">http://localhost:4000/notes/ejecting-hard-drive</guid>
+        </item>
+      
+    
+      
+        <item>
           <title>Microphone workaround for MacBook using iPhone</title>
           <description>&lt;p&gt;Accidentally ripped your microphone off your MacBook motherboard, like I just did? Or your microphone just not working? Don’t worry. There’s a workaround. You just need your iPhone, as well as taking these four steps:&lt;/p&gt;
 

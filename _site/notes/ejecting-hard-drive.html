@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+
+	<head>
+		<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+
+	<title>Resolving MacOS error "The disk couldn't be ejected because one or more programs may be using it." · briennakh</title>
+
+
+<meta name="twitter:card" content="summary" />
+<meta name="twitter:site" content="@briennakh" />
+<meta name="twitter:title" content="Resolving MacOS error "The disk couldn't be ejected because one or more programs may be using it."" />
+<meta name="twitter:description" content="When attempting to eject an external hard drive using MacOS, sometimes we get the error The disk “[EXTERNAL_HARD_DRIVE_NAME]” couldn’t be ejected because one or more programs may be using it. To ej...">
+
+<meta name="description" content="When attempting to eject an external hard drive using MacOS, sometimes we get the error The disk “[EXTERNAL_HARD_DRIVE_NAME]” couldn’t be ejected because one...">
+
+
+	<meta name="google-site-verification" content="epFgX0s_0RM3CdjwFcsewfXzPov2g8s9ZBOLyaIUH-o">
+
+
+<link rel="icon" href="/assets/favicon.png">
+<link rel="apple-touch-icon" href="/assets/touch-icon.png">
+<link rel="stylesheet" href="/assets/core.css">
+<link rel="canonical" href="/notes/ejecting-hard-drive">
+<link rel="alternate" type="application/atom+xml" title="briennakh" href="/feed.xml" />
+
+
+
+
+<script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+
+	</head>
+
+	<body>
+
+		<aside class="logo">
+
+	
+
+	<a href="/">
+		<img src="http://www.gravatar.com/avatar/a1874522e5d9bff764e068c928f0e3c0.png?s=80" class="gravatar">
+	</a>
+	<span class="logo-prompt">Back to Home</span>
+
+</aside>
+
+
+		<main>
+			<article>
+
+	<div class="center">
+		<h1>Resolving MacOS error "The disk couldn't be ejected because one or more programs may be using it."</h1>
+		<time>September 9, 2018</time>
+	</div>
+
+	<div class="divider"></div>
+
+	<p>When attempting to eject an external hard drive using MacOS, sometimes we get the error <em>The disk “[EXTERNAL_HARD_DRIVE_NAME]” couldn’t be ejected because one or more programs may be using it. To eject the disk immediately, click the Force Eject button.</em></p>
+
+<p>Only we don’t always know <em>which</em> programs are using the drive.</p>
+
+<p>Open Terminal and enter <code class="highlighter-rouge">lsof | grep /Volumes/[EXTERNAL_HARD_DRIVE_NAME]</code>.</p>
+
+<p>We should get a list that looks like this:</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>photoanal 30331 Brienna  txt       REG               1,12      32768   194381 /Volumes/BRIENNAKH/Photos Library 3.photoslibrary/private/com.apple.photoanalysisd/GraphService/PhotosGraph/photosgraph.graphdb-shm
+photoanal 30331 Brienna    3u      REG               1,12    1892352   194380 /Volumes/BRIENNAKH/Photos Library 3.photoslibrary/private/com.apple.photoanalysisd/GraphService/PhotosGraph/photosgraph.graphdb
+photoanal 30331 Brienna    4u      REG               1,12          0   194382 /Volumes/BRIENNAKH/Photos Library 3.photoslibrary/private/com.apple.photoanalysisd/GraphService/PhotosGraph/photosgraph.graphdb-wal
+photoanal 30331 Brienna    5u      REG               1,12      32768   194381 /Volumes/BRIENNAKH/Photos Library 3.photoslibrary/private/com.apple.photoanalysisd/GraphService/PhotosGraph/photosgraph.graphdb-shm
+</code></pre></div></div>
+
+<p>These are the programs that are using the hard drive. We need to quit or kill them before we can eject the hard drive safely.</p>
+
+<p>We can quit most programs normally, but some programs need to be killed via the Terminal. To do this, enter <code class="highlighter-rouge">kill [PROGRAM ID]</code>. In the list above, the ID is the number after the program name. So <code class="highlighter-rouge">kill 30331</code>.</p>
+
+<p>But the photoanalysis daemon usually withstands death via Terminal. (I have a Photos library on the drive and photoanalysis is a process associated with Photos.) Looking at questions other people have posted online regarding this issue, it seems like the best solution is to force kill it via Activity Monitor.</p>
+
+<p>An interesting read: <a href="https://www.sciencealert.com/does-it-matter-if-you-pull-a-usb-without-waiting-for-it-to-safely-eject">Does it really matter if you pull a USB out before it safely ejects?</a> 
+I’m often guilty of just yanking the USB out, but I’m more hesistant to do so with my hard drive, since it’s the main backup for my MacBook.</p>
+
+
+    <!--DISQUS-->
+    
+    <div id="disqus_thread"></div>
+    <script>
+        var disqus_config = function () {
+        this.page.url = "http://localhost:4000/notes/ejecting-hard-drive";
+        this.page.identifier = "/notes/ejecting-hard-drive"; 
+        };
+        
+        (function() { // DON'T EDIT BELOW THIS LINE
+        var d = document, s = d.createElement('script');
+        s.src = 'https://briennakh-github-io.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', +new Date());
+        (d.head || d.body).appendChild(s);
+        })();
+    </script>
+    <noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>                          
+    
+
+</article>
+
+
+
+
+<div class="page-navigation">
+	
+		<a class="home" href="/" title="Back to Homepage">Home</a>
+  
+		<span> &middot; </span>
+    <a class="prev" href="/notes/microphone-workaround" title="PREV: Microphone workaround for MacBook using iPhone">&gt;&gt;</a>
+  
+</div>
+
+		</main>
+
+		<div class="footer">
+  <span class="block">&lt;/&gt; <a href="http://github.com/heiswayi/the-plain" title="a minimalist Jekyll theme for personal blog">The Plain theme</a> by <a href="http://heiswayi.github.io">Heiswayi Nrird</a>.</span>
+  <span class="block">&copy; 2018 Brienna Herold</span>
+</div>
+
+
+	</body>
+
+</html>
