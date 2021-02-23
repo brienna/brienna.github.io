@@ -67,16 +67,15 @@
 	<!-- SECTION: INTRO -->
 	<section id="intro">
 		<div>
-			<h1>hello world</h1>
-			<br>
-			<p>My name is Brienna Herold. I'm a data scientist. I create and analyze datasets to learn trends, patterns, and other details that are necessary for real world changes. For fun, I do pretty much the same thing, but I play a little bit more with fun ideas.</p>
+			<h1 class="section-heading">hello world</h1>
+			<p class="section-description">My name is Brienna Herold. I'm a data scientist. I create and analyze datasets to learn trends, patterns, and other details that are necessary for real world changes. For fun, I do pretty much the same thing, but I play a little bit more with fun ideas.</p>
+		</div>
 	</section>
 
 
 	<!-- SECTION: PROJECTS -->
 	<section class="projects-wrapper center" id="projects">
-		<h1>projects</h1>
-		<br>
+		<h1 class="section-heading">projects</h1>
 
 
         <div class="container-fluid ">
@@ -101,7 +100,7 @@
 
 		<!-- gallery -->
 		<div class="container-fluid projects no-pad clearfix">
-			<div class="row">
+			<div class="row"><!--
 				<div class="project col-md-4 col-sm-6 col-xs-12 no-pad data">
 					<img src="img/deafu.png"/>
 
@@ -180,18 +179,17 @@
                 			<a href="https://github.com/brienna/client-side-development/tree/gh-pages" target="_blank" class="btn btn-project">see it</a>
                   		</div>
                 	</div>
-				</div>
+				</div>-->
 			</div>
 		</div>
 	</section>
 
 	<!-- SECTION: CONTACT -->
 	<section class="center" id="contact">
-		<div>
-			<h1>contact</h1>
-			<p>Feel free to send me a message if you would like to chat.</p>
-			<div class="col-sm-6 col-sm-push-3 center">
-				<div class="form-wrapper">
+		<div style="width: 100%;">
+			<h1 class="section-heading">contact</h1>
+			<div class="col-lg-4 col-md-6 col-sm-12 col-xs-12 center">
+				<div class="form-wrapper" style="vertical-align: middle">
 					<form action="https://formspree.io/f/xaylzrzk" method="POST" accept-charset="UTF-8">
 						<div class="inputs-wrapper">
 							<input class="form-name validate-required" type="text" placeholder="your name" name="name">
@@ -199,18 +197,28 @@
 							<textarea class="form-message validate-required" name="message" placeholder="your message"></textarea>
 						</div>
 						<input type="submit" class="send-form btn" value="send message">
-						<div class="success">
+						<div class="message">
+							<div class="success">
 							I received your message, thank you!
+							</div>
+							<div class="error">
+								Please complete the form correctly.
+							</div>
 						</div>
-						<div class="form-error">
-							Please complete the form correctly.
-						</div>
+						
 					</form>
 				</div>
 			</div>
 		</div>
-
 	</section>
+
+
+	<footer class="container-fluid">
+		<div class="row">
+			<div class="col-sm-12">
+				<span>© 2021 brienna herold
+			</div>
+		</div>
 
 
 

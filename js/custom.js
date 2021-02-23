@@ -42,22 +42,20 @@ $(document).ready(function() {
 		// Validate email
 		$(this).find('.validate-email').each(function(){
 			if(!(/(.+)@(.+){2,}\.(.+){2,}/.test($(this).val()))){
-				$(this).addClass('field-error');
+				$('.validate-email').addClass('field-error');
 				error = 1;
 			}else{
-				$(this).removeClass('field-error');
+				$('.validate-email').removeClass('field-error');
 			}
 		});
 
 		// If validation is OK, send form, otherwise show error
 		if (error == 1) {
-			// Show error dialog
-			$('.form-error').fadeIn(200);
-			setTimeout(function(){$('.form-error').fadeOut(500); }, 5000);
+			// Show error dialog briefly
+			$('.error').fadeTo(200, 1);
+			setTimeout(function(){$('.error').fadeTo(200, 0); }, 5000);
 		} else {
-			// Hide error dialog
-			$('.form-error').fadeOut(200);
-
+			// Send message
 		  	$.ajax({
 			    type: "POST",
 			    url: $(this).attr("action"),
@@ -72,9 +70,8 @@ $(document).ready(function() {
 			    }
 		  	}).done(function(e) {
 		  		//console.log(e);
-		  		console.log("sent...");
-		     	$('.success').fadeIn(1000);
-				setTimeout(function(){$('.success').fadeOut(500); }, 5000);
+		     	$('.success').css('z-index', 2).fadeTo(200, 1);
+				setTimeout(function(){$('.success').fadeTo(200, 0).css('z-index', 0); }, 5000);
 		  	}).fail(function() {
 		     	alert('An error occurred please try again later.');
 		  	});
