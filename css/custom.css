@@ -1,0 +1,32 @@
+html, body {
+	font: 0.9em 'Lucida Console', Monaco, monospace;
+	height: 100%;
+    width: 100%;
+}
+
+a {
+    text-decoration: none;
+    color: black;
+}
+
+.navbar {
+    padding: 30px 40px;
+}
+.navbar-brand {
+    padding-right: 100px;
+}
+@media (min-width: 992px) {
+    .navbar-expand-lg .navbar-nav .nav-link {
+        padding-right: 3rem;
+        padding-left: 1rem;
+    }
+    .navbar-expand-lg .navbar-nav .nav-icon {
+        padding-right: 0.5rem;
+        padding-left: 0.5rem;
+    }
+}
+
+i {
+    color: rgba(0,0,0,1);
+}
+

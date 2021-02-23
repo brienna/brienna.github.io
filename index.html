@@ -4,71 +4,70 @@
 <head>
 	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
     <meta charset="utf-8"/>
+
 	<!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.gstatic.com">
     <link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
 
-    <style>
-    	html, body {
-    		font: 0.9em 'Libre Baskerville';
-    		height: 100%;
-    	}
+    <!--Font Awesome -->
+    <script src="https://use.fontawesome.com/ee8f57f9da.js"></script>
 
-    	.container {
-    		height: 100%;
-    		width: 100%;
-    		display: table;
-    	}
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-2.1.3.js"></script>
 
-    	.container > div { 
-    		display: table-cell;
-    		height: 100%;
-    		vertical-align: middle;
-    	}
+    <!-- Bootstrap -->
+     <link href="css/bootstrap.min.css" rel="stylesheet" type="text/css" media="all"/>
+     <script src="js/bootstrap.min.js"></script>
 
-    	img {
-    		display: block;
-    		margin: 0 auto;
-    	}
+    <!-- Custom style and code -->
+    <link rel="stylesheet" type="text/css" href="css/custom.css" media="screen" />
 
-
-    	.container > div > div {
-
-    		display: block;
-    		width: 125px;
-    		margin: 0 auto;
-    	}
-
-    	.container > div > div:nth-child(2) {
-    		width: 200px;
-    		margin: 0 auto;
-    	}
-
-
-    	a {
-    		text-decoration: none;
-    	}
-
-
-    </style>
 </head>
 <body>
 
-	<div class='container'>
-		<div>
-			<img src="construction.gif"/>
-			<div>
-				<br><br><br>
-				<span>... <em>portfolio under construction</em> ...</span><br><br><br>
+	<!-- NAV BAR -->
+	<div class="container"> <!-- limits width -->
+		<nav class="navbar navbar-expand-lg navbar-light bg-transparent">
+			<a class="navbar-brand" href="#">brienna herold</a> <!-- remove active if not on page currently? -->
+			<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+				<span class="navbar-toggler-icon"></span>
+			</button>
+
+			<div class="collapse navbar-collapse" id="navbarSupportedContent">
+				<ul class="navbar-nav ml-auto"> <!-- mr-auto will left-align -->
+					<li class="nav-item">
+						<a class="nav-link" href="/projects.html">projects <span class="sr-only">(current)</span></a>
+					</li>
+					<li class="nav-item">
+						<a class="nav-link" href="#">résumé</a>
+					</li>
+					<li class="nav-item">
+						<a class="nav-link" href="#">contact</a>
+					</li>
+					<li class="nav-item">
+						<a class="nav-link nav-icon" href=""><i class="icon fa fa-twitter"></i></a>
+					</li>
+					<li class="nav-item">
+						<a class="nav-link nav-icon"  href=""><i class="icon fa fa-medium"></i></a>
+					</li>
+					<li class="nav-item">
+						<a class="nav-link nav-icon"  href=""><i class="icon fa fa-linkedin"></i></a>
+					</li>
+					<li class="nav-item">
+						<a class="nav-link nav-icon"  href=""><i class="icon fa fa-github"></i></a>
+					</li>	
+				</ul>
 			</div>
-			<div>
-				<p>GitHub: <a href="http://github.com/brienna" target="_blank">brienna</a><br>
-				Twitter: <a href="http://twitter.com/@briennakh" target="_blank">briennakh</a>
-				Medium: <a href="http://brienna.medium.com" target="_blank">brienna</a></p>
-				<br><br><br><br><br><br><br><br>
-			</div>
-		</div>
+		</nav>
 	</div>
+
+
+
+
+
+
+
+
 
 </body>
 </html>
