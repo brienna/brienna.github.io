@@ -99,13 +99,9 @@ i {
     transition: all 1s ease-in-out;
 }
 
-
-
 .project {
     width: 101%;
-    height: 400px;
     float: left;
-    position: relative;
     overflow: hidden;
 }
 .project img {
@@ -113,52 +109,57 @@ i {
     height:100%;
     border: none;
 }
-.project .hover-state {
-  position: absolute;
-  width: 105%;
-  height: 100%;
-  top:0;
-  background-color: rgba(255,255,255,.9);
-  text-align: center;
-  -webkit-transition: all .5s ease;
-  -moz-transition: all .5s ease;
-  transition: all .5s ease;
-  opacity: 0;
-  padding: 0 25px 0 25px;
+
+
+.content {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
   font-family: "Raleway", "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
 }
-.project:hover .hover-state {
-  opacity: 1;
+.content h1 {
+  font-size: 1.5rem;
 }
-.project .hover-state h1 {
-  margin-bottom: 12px;
-  font-size: 16pt;
-  line-height: 20pt;
-}
-.project .hover-state h3 {
-  font-size: 12pt;
-  margin-bottom: 8px;
-}
-.project .hover-state p {
-  margin-bottom: 30px;
-  font-size:11pt;
-  line-height: 12pt;
-}
-.hover-state .align-vertical {
-  -webkit-transform: translate3d(0, 200px, 0);
-  -moz-transform: translate3d(0, 200px, 0);
-  transform: translate3d(0, 200px, 0);
-  -webkit-transition: all .5s ease;
-  -moz-transition: all .5s ease;
-  transition: all .5s ease;
+.content .overlay {
+  background-color: rgba(255,255,255,.9);
+  position: absolute;
+  height: 100%;
+  width: 100%;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  right: 0;
   opacity: 0;
+  -webkit-transition: all 0.4s ease-in-out 0s;
+  -moz-transition: all 0.4s ease-in-out 0s;
+  transition: all 0.4s ease-in-out 0s;
 }
-.project:hover .align-vertical {
-  -webkit-transform: translate3d(0, 50%, 0);
-  -moz-transform: translate3d(0, 50%, 0); /* vertically aligns w/ the 50% */
-  transform: translate3d(0, 50%, 0);
+.content:hover .overlay {
   opacity: 1;
 }
+.content-details {
+  position: absolute;
+  text-align: center;
+  padding-left: 1em;
+  padding-right: 1em;
+  width: 100%;
+  top: 0;
+  left: 50%;
+  opacity: 0;
+  -webkit-transform: translate(-50%, -50%);
+  -moz-transform: translate(-50%, -50%);
+  transform: translate(-50%, -50%);
+  -webkit-transition: all 0.3s ease-in-out 0s;
+  -moz-transition: all 0.3s ease-in-out 0s;
+  transition: all 0.3s ease-in-out 0s;
+}
+.content:hover .content-details {
+  top: 50%;
+  left: 50%;
+  opacity: 1;
+}
+
+
 .btn {
   background: none;
   -webkit-transition: all .3s ease;
